@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -10,5 +10,18 @@
   <ItemGroup>
     <ProjectReference Include="..\ST7789V3\ST7789V3\ST7789V3.csproj" />
   </ItemGroup>
-
+	<ItemGroup>
+		<PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Update="Pic\LCD_1inch47.jpg">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Pic\verdure.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="Pic\verdure90.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 </Project>

@@ -55,10 +55,53 @@ namespace Iot.Device.ST7789V3
 
         private void Initialize()
         {
+            Console.WriteLine("init ok");
             _gpio.OpenPin(_resetPin, PinMode.Output);
             _gpio.OpenPin(_dataCommandPin, PinMode.Output);
-            _gpio.OpenPin(_backlightPin, PinMode.Output);
-            _gpio.Write(_backlightPin, PinValue.High);
+            //_gpio.OpenPin(_backlightPin, PinMode.Output);
+            //_gpio.Write(_backlightPin, PinValue.High);
+        }
+
+        public void SpiWrite(bool isData, ReadOnlySpan<byte> writeData)
+        {
+            Console.WriteLine($"writeData length:{writeData.Length}");
+
+            _gpio.Write(_dataCommandPin, isData ? PinValue.High : PinValue.Low);
+
+            _sensor.Write(writeData);
+            //Span<byte> readBuf = stackalloc byte[writeData.Length];
+
+            //_sensor.TransferFullDuplex(writeData, readBuf);
+        }
+
+        public void SetWindows(int xStart, int yStart, int xEnd, int yEnd)
+        {
+            // set the X coordinates
+            SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0x2A }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { (byte)(((xStart) >> 8) & 0xff) }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { (byte)((xStart + 34) & 0xff) }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { (byte)((xEnd - 1 + 34) >> 8 & 0xff) }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { (byte)((xEnd - 1 + 34) & 0xff) }));
+
+            // set the Y coordinates
+            SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0x2B }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { (byte)((yStart) >> 8 & 0xff) }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { (byte)((yStart) & 0xff) }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { (byte)((yEnd - 1) >> 8 & 0xff) }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { (byte)((yEnd - 1) & 0xff) }));
+
+            SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0x2C }));
+        }
+
+        public void Reset()
+        {
+            _gpio.Write(_resetPin, PinValue.High);
+            Thread.Sleep(1);
+            Console.WriteLine("reset high");
+            _gpio.Write(_resetPin, PinValue.Low);
+            Thread.Sleep(1);
+            Console.WriteLine("reset low");
+            _gpio.Write(_resetPin, PinValue.High);
         }
 
         public void Dispose()

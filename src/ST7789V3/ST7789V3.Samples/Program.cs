@@ -156,7 +156,7 @@ var dataLcdList = new byte[172 * 320 * 2];
 
 for (int j = 0; j < dataLcdList.Length; j++)
 {
-    dataLcdList[j] = 0xFF;
+    dataLcdList[j] = 0x11;
 }
 
 lcd.SpiWrite(true, new ReadOnlySpan<byte>(dataLcdList));

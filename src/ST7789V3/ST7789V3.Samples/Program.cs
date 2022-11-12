@@ -1,10 +1,12 @@
 ﻿using Iot.Device.ST7789V3;
 using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Advanced;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using System.Device.Pwm;
 using System.Device.Pwm.Drivers;
 using System.Device.Spi;
+using System.Runtime.InteropServices;
 
 var resetPin = 27;
 var dataCommandPin = 25;
@@ -106,28 +108,33 @@ lcd.SetWindows(0, 0, 172, 320);
 
 //var imageFilePath = "./Pic/LCD_1inch47.jpg";
 var imageFilePath = "./Pic/verdure90.png";
-using var image = Image.Load<Rgba32>(imageFilePath);
+using var image = Image.Load<Bgr565>(imageFilePath);
+
+var _IMemoryGroup = image.GetPixelMemoryGroup();
+var _MemoryGroup = _IMemoryGroup.ToArray()[0];
+
+var PixelData = MemoryMarshal.AsBytes(_MemoryGroup.Span).ToArray();
 
 //image.Mutate(x => x.Resize(new Size(172, 320)));
 
-image.Mutate(x => x.BlackWhite());
+//image.Mutate(x => x.BlackWhite());
 
-var colWhite = new Rgba32(255, 255, 255);
-var width = 172;
-var result = new byte[504];
+//var colWhite = new Rgba32(255, 255, 255);
+//var width = 172;
+//var result = new byte[504];
 
-for (var pos = 0; pos < result.Length; pos++)
-{
-    byte toStore = 0;
-    for (int bit = 0; bit < 8; bit++)
-    {
-        var x = pos % width;
-        var y = pos / width * 8 + bit;
-        toStore = (byte)(toStore | ((image[x, y] == colWhite ? 0 : 1) << bit));
-    }
+//for (var pos = 0; pos < result.Length; pos++)
+//{
+//    byte toStore = 0;
+//    for (int bit = 0; bit < 8; bit++)
+//    {
+//        var x = pos % width;
+//        var y = pos / width * 8 + bit;
+//        toStore = (byte)(toStore | ((image[x, y] == colWhite ? 0 : 1) << bit));
+//    }
 
-    result[pos] = toStore;
-}
+//    result[pos] = toStore;
+//}
 
 //var dataLcd = new byte[172 * 320 * 3];
 
@@ -159,7 +166,7 @@ for (int j = 0; j < dataLcdList.Length; j++)
     dataLcdList[j] = 0x11;
 }
 
-lcd.SpiWrite(true, new ReadOnlySpan<byte>(dataLcdList));
+lcd.SpiWrite(true, new ReadOnlySpan<byte>(PixelData));
 
 
 //var resultString = $"var bitmap = new byte[] {{{String.Join(",", result.Select(b => $"0x{b.ToString("X2")}"))}}}";

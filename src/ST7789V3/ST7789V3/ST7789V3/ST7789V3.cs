@@ -68,7 +68,24 @@ namespace Iot.Device.ST7789V3
 
             _gpio.Write(_dataCommandPin, isData ? PinValue.High : PinValue.Low);
 
-            _sensor.Write(writeData);
+            for (int i = 0; i < writeData.Length; i += 4096)
+            {
+                var query = writeData[i..(i + 4096)];
+                _sensor.Write(writeData);
+            }
+
+            //if (writeData.Length > 4096)
+            //{
+            //    for (int i = 0; i < writeData.Length; i += 4096)
+            //    {
+            //        var query = writeData[i..(i + 4096)];
+            //        _sensor.Write(writeData);
+            //    }
+            //}
+            //else
+            //{
+            //    _sensor.Write(writeData);
+            //}
             //Span<byte> readBuf = stackalloc byte[writeData.Length];
 
             //_sensor.TransferFullDuplex(writeData, readBuf);

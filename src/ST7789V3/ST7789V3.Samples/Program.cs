@@ -102,7 +102,7 @@ lcd.SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0x21 }));
 lcd.SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0x11 }));
 lcd.SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0x29 }));
 
-lcd.SetWindows(0, 0, 320, 170);
+lcd.SetWindows(0, 0, 172, 320);
 
 //var imageFilePath = "./Pic/LCD_1inch47.jpg";
 var imageFilePath = "./Pic/verdure90.png";
@@ -135,23 +135,31 @@ for (var pos = 0; pos < result.Length; pos++)
 //{
 //    dataLcd[i] = 0x00;
 //}
-for (int i = 0; i < 26; i++)
-{
-    var dataLcdList = new byte[4096];
+//for (int i = 0; i < 26; i++)
+//{
+//    var dataLcdList = new byte[4096];
 
-    for (int j = 0; j < dataLcdList.Length; j++)
-    {
-        dataLcdList[i] = 0xFF;
-    }
-    lcd.SpiWrite(true, new ReadOnlySpan<byte>(dataLcdList));
-}
-var dataLcdList1 = new byte[3584];
+//    for (int j = 0; j < dataLcdList.Length; j++)
+//    {
+//        dataLcdList[i] = 0xFF;
+//    }
+//    lcd.SpiWrite(true, new ReadOnlySpan<byte>(dataLcdList));
+//}
+//var dataLcdList1 = new byte[3584];
 
-for (int j = 0; j < dataLcdList1.Length; j++)
+//for (int j = 0; j < dataLcdList1.Length; j++)
+//{
+//    dataLcdList1[j] = 0xFF;
+//}
+
+var dataLcdList = new byte[172 * 320 * 2];
+
+for (int j = 0; j < dataLcdList.Length; j++)
 {
-    dataLcdList1[j] = 0xFF;
+    dataLcdList[j] = 0xFF;
 }
-lcd.SpiWrite(true, new ReadOnlySpan<byte>(dataLcdList1));
+
+lcd.SpiWrite(true, new ReadOnlySpan<byte>(dataLcdList));
 
 
 //var resultString = $"var bitmap = new byte[] {{{String.Join(",", result.Select(b => $"0x{b.ToString("X2")}"))}}}";

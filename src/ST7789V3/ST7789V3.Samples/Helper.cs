@@ -37,17 +37,17 @@ namespace LedMatrix.Helpers
                 {
                     var imagePx = original[rowIdx, columnIdx].PackedValue;
 
-                    var red = imagePx & 0xf800; //蓝色
+                    var red = imagePx & 0xf800 >> 8; //蓝色
 
-                    var blue = imagePx & 0x07e0; //绿色
+                    var green = imagePx & 0x07e0 >> 3; //绿色
 
-                    var green = imagePx & 0x001f; //红色
+                    var blue = imagePx & 0x001f << 3; //红色
 
 
 
-                    Console.WriteLine($"b:{red}g:{blue}r:{green}");
+                    Console.WriteLine($"r:{red}g:{green}b:{blue}");
 
-                    var data = CreatePixelFromRgb((byte)green, (byte)blue, (byte)red);
+                    var data = CreatePixelFromRgb((byte)red, (byte)green, (byte)blue);
 
                     Console.WriteLine(data.ToString());
                     //Console.WriteLine($"x:{original[rowIdx, columnIdx].ToVector3().X}y:{original[rowIdx, columnIdx].ToVector3().Y}z:{original[rowIdx, columnIdx].ToVector3().Z}");

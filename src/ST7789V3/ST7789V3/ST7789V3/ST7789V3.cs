@@ -195,6 +195,18 @@ namespace Iot.Device.ST7789V3
             _gpio.Write(_resetPin, PinValue.High);
         }
 
+        public void Clear()
+        {
+            var dataList = new byte[172 * 320 * 2];
+
+            for (int i = 0; i < dataList.Length; i++)
+            {
+                dataList[i] = 0xff & 0xF800;
+            }
+
+            SpiWrite(true, new ReadOnlySpan<byte>(dataList));
+        }
+
         public void Dispose()
         {
             throw new NotImplementedException();

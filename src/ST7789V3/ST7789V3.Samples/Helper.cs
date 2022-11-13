@@ -37,9 +37,22 @@ namespace LedMatrix.Helpers
                 {
                     var imagePx = original[rowIdx, columnIdx].PackedValue;
 
-                    Console.WriteLine($"x:{original[rowIdx, columnIdx].ToVector3().X}y:{original[rowIdx, columnIdx].ToVector3().Y}z:{original[rowIdx, columnIdx].ToVector3().Z}");
+                    var red = imagePx & 0xf800; //À¶É«
 
-                    pixelList[idx++] = (Int16)imagePx;
+                    var blue = imagePx & 0x07e0; //ÂÌÉ«
+
+                    var green = imagePx & 0x001f; //ºìÉ«
+
+
+
+                    Console.WriteLine($"b:{red}g:{blue}r:{green}");
+
+                    var data = CreatePixelFromRgb((byte)green, (byte)blue, (byte)red);
+
+                    Console.WriteLine(data.ToString());
+                    //Console.WriteLine($"x:{original[rowIdx, columnIdx].ToVector3().X}y:{original[rowIdx, columnIdx].ToVector3().Y}z:{original[rowIdx, columnIdx].ToVector3().Z}");
+                    pixelList[idx++] = data;
+                    //pixelList[idx++] = (Int16)imagePx;
                 }
             }
             return pixelList.ConvertToByteArray();

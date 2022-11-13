@@ -26,7 +26,7 @@ namespace LedMatrix.Helpers
             return arrayAsByte;
         }
 
-        public static byte[] ImageToRgb565(this Image<Bgr565> original, int width, int height)
+        public static byte[] ImageToRgb565(this Image<Rgba32> original, int width, int height)
         {
             Int16[] pixelList = new Int16[width * height];
 
@@ -35,21 +35,21 @@ namespace LedMatrix.Helpers
             {
                 for (int rowIdx = 0; rowIdx < original.Width; ++rowIdx)
                 {
-                    var imagePx = original[rowIdx, columnIdx].PackedValue;
+                    var imagePx = original[rowIdx, columnIdx];
 
-                    var red = imagePx & 0xf800 >> 8; //À¶É«
+                    //var red = imagePx & 0x001F << 11;
 
-                    var green = imagePx & 0x07e0 >> 3; //ÂÌÉ«
+                    //var green = imagePx & 0x07E0 >> 5;
 
-                    var blue = imagePx & 0x001f << 3; //ºìÉ«
+                    //var blue = imagePx & 0xF800 >> 11;
 
 
 
-                    Console.WriteLine($"r:{red}g:{green}b:{blue}");
+                    //Console.WriteLine($"r:{red}g:{green}b:{blue}");
 
-                    var data = CreatePixelFromRgb((byte)red, (byte)green, (byte)blue);
+                    var data = CreatePixelFromRgb((byte)imagePx.B, (byte)imagePx.G, (byte)imagePx.R);
 
-                    Console.WriteLine(data.ToString());
+                    //Console.WriteLine(data.ToString());
                     //Console.WriteLine($"x:{original[rowIdx, columnIdx].ToVector3().X}y:{original[rowIdx, columnIdx].ToVector3().Y}z:{original[rowIdx, columnIdx].ToVector3().Z}");
                     pixelList[idx++] = data;
                     //pixelList[idx++] = (Int16)imagePx;
@@ -60,7 +60,13 @@ namespace LedMatrix.Helpers
 
         public static Int16 CreatePixelFromRgb(byte r, byte g, byte b)
         {
-            return (Int16)((r << 11) | (g << 5) | b);
+            return (Int16)(
+    (((b >> 3) & 0x1f) << 11)
+    | (((g >> 2) & 0x3f) << 5)
+    | ((r >> 3) & 0x1f)
+);
+            //return (Int16)(r | g | b);
+            //return (Int16)((r << 11) | (g << 5) | b);
         }
 
         public static void Rotate(this Image<Bgr565> original, int angle)

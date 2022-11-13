@@ -27,16 +27,22 @@ lcd.Reset();
 lcd.Init();
 lcd.SetWindows(0, 0, 172, 320);
 
-var imageFilePath = "./Pic/LCD_1inch47.jpg";
+lcd.Clear();
+
+var imageFilePath = "./Pic/excited.png";
 //var imageFilePath = "./Pic/verdure90.png";
 
 var image = Image.Load<Bgr565>(imageFilePath);
 
-//var dataList = new byte[172 * 320 * 2];
+var dataList = new byte[172 * 320 * 2];
 
-//image.CopyPixelDataTo(dataList);
+image.CopyPixelDataTo(dataList);
 
-var dataList = image.ImageToRgb565(image.Width, image.Height);
+//var image2 = Image.LoadPixelData<Bgr565>(dataList, 172, 320);
+
+//await image2.SaveAsJpegAsync("/Pic/LCD_1inch47-01.jpg");
+
+//var dataList = image.ImageToRgb565(image.Width, image.Height);
 
 lcd.SpiWrite(true, new ReadOnlySpan<byte>(dataList));
 

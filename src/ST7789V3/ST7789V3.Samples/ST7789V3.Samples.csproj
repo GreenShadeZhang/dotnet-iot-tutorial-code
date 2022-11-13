@@ -15,6 +15,9 @@
 		<PackageReference Include="SkiaSharp" Version="2.88.3" />
 	</ItemGroup>
 	<ItemGroup>
+	  <None Update="Pic\excited.png">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	  <None Update="Pic\LCD_1inch47.jpg">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>

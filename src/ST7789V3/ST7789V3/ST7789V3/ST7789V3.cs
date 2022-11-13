@@ -8,7 +8,6 @@ namespace Iot.Device.ST7789V3
     {
         private int _resetPin;
         private int _dataCommandPin;
-        private int _backlightPin = -1;
         private PwmChannel? _pwmBacklight;
 
         private GpioController _gpio;
@@ -58,8 +57,6 @@ namespace Iot.Device.ST7789V3
             Console.WriteLine("init ok");
             _gpio.OpenPin(_resetPin, PinMode.Output);
             _gpio.OpenPin(_dataCommandPin, PinMode.Output);
-            //_gpio.OpenPin(_backlightPin, PinMode.Output);
-            //_gpio.Write(_backlightPin, PinValue.High);
         }
 
         public void SpiWrite(bool isData, ReadOnlySpan<byte> writeData)
@@ -68,22 +65,15 @@ namespace Iot.Device.ST7789V3
 
             _gpio.Write(_dataCommandPin, isData ? PinValue.High : PinValue.Low);
 
-
-
             if (writeData.Length > 4096)
             {
-                for (int i = 0; i < 26; i ++)
+                for (int i = 0; i < 26; i++)
                 {
-                    var query = writeData[i..(i + 4096)];
+                    var query = writeData[(i * 4096)..((i * 4096) + 4096)];
                     _sensor.Write(query);
                 }
 
-                var dataLcdList1 = new byte[3584];
-
-                for (int j = 0; j < dataLcdList1.Length; j++)
-                {
-                    dataLcdList1[j] = 0x11;
-                }
+                var dataLcdList1 = writeData[(26 * 4096)..110080];
 
                 _sensor.Write(dataLcdList1);
             }
@@ -94,6 +84,85 @@ namespace Iot.Device.ST7789V3
             //Span<byte> readBuf = stackalloc byte[writeData.Length];
 
             //_sensor.TransferFullDuplex(writeData, readBuf);
+        }
+
+        public void Init()
+        {
+            SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0x36 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x00 }));
+
+            SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0x3A }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x05 }));
+
+
+            SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0xB2 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x0C }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x0C }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x00 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x33 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x33 }));
+
+            SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0xB7 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x35 }));
+
+            SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0xBB }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x35 }));
+
+            SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0xC0 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x2C }));
+
+            SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0xC2 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x01 }));
+
+            SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0xC3 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x13 }));
+
+            SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0xC4 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x20 }));
+
+            SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0xC6 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x0F }));
+
+            SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0xD0 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0xA4 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0xA1 }));
+
+            SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0xE0 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0xF0 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0xF0 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x00 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x04 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x04 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x04 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x05 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x29 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x33 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x3E }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x38 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x12 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x12 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x28 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x30 }));
+
+            SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0xE1 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0xF0 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x07 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x0A }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x0D }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x0B }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x07 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x28 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x33 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x3E }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x36 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x14 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x14 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x29 }));
+            SpiWrite(true, new ReadOnlySpan<byte>(new byte[] { 0x32 }));
+
+            SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0x21 }));
+            SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0x11 }));
+            SpiWrite(false, new ReadOnlySpan<byte>(new byte[] { 0x29 }));
         }
 
         public void SetWindows(int xStart, int yStart, int xEnd, int yEnd)

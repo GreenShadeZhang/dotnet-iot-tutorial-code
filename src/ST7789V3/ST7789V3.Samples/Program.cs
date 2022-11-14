@@ -46,6 +46,13 @@ image.CopyPixelDataTo(dataList);
 
 lcd.SpiWrite(true, new ReadOnlySpan<byte>(dataList));
 
+Thread.Sleep(3000);
+
+lcd.Clear();
+
+Thread.Sleep(3000);
+
+lcd.SpiWrite(true, new ReadOnlySpan<byte>(dataList));
 
 //var resultString = $"var bitmap = new byte[] {{{String.Join(",", dataList.Select(b => $"0x{b.ToString("X2")}"))}}}";
 //Console.WriteLine(resultString);

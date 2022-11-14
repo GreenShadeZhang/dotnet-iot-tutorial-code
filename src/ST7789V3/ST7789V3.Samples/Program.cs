@@ -1,5 +1,4 @@
 ﻿using Iot.Device.ST7789V3;
-using LedMatrix.Helpers;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Device.Pwm.Drivers;

@@ -10,8 +10,8 @@ namespace Iot.Device.ST7789V3
         private int _dataCommandPin;
         private PwmChannel? _pwmBacklight;
 
-        private GpioController _gpio;
-        private SpiDevice _sensor;
+        private GpioController? _gpio;
+        private SpiDevice? _sensor;
         private bool _shouldDispose;
 
 
@@ -81,9 +81,6 @@ namespace Iot.Device.ST7789V3
             {
                 _sensor.Write(writeData);
             }
-            //Span<byte> readBuf = stackalloc byte[writeData.Length];
-
-            //_sensor.TransferFullDuplex(writeData, readBuf);
         }
 
         public void Init()
@@ -209,7 +206,31 @@ namespace Iot.Device.ST7789V3
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            if (_shouldDispose)
+            {
+                _gpio?.Dispose();
+                _gpio = null;
+            }
+            else
+            {
+                if (_gpio is not null)
+                {
+                    if (_gpio.IsPinOpen(_dataCommandPin))
+                    {
+                        _gpio.ClosePin(_dataCommandPin);
+                    }
+
+                    if (_gpio.IsPinOpen(_resetPin))
+                    {
+                        _gpio.ClosePin(_resetPin);
+                    }
+                }
+            }
+
+            _sensor?.Dispose();
+            _sensor = null;
+            _pwmBacklight?.Dispose();
+            _pwmBacklight = null;
         }
     }
 }

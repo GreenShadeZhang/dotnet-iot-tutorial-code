@@ -1,6 +1,7 @@
 ﻿using Iot.Device.ST7789V3;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Textures.PixelFormats;
 using System.Device.Pwm.Drivers;
 using System.Device.Spi;
 
@@ -28,10 +29,10 @@ lcd.SetWindows(0, 0, 172, 320);
 
 lcd.Clear();
 
-var imageFilePath = "./Pic/excited.png";
-//var imageFilePath = "./Pic/verdure90.png";
+//var imageFilePath = "./Pic/excited.png";
+var imageFilePath = "./Pic/LCD_1inch47.jpg";
 
-var image = Image.Load<Bgr565>(imageFilePath);
+var image = Image.Load<Rgb565>(imageFilePath);
 
 var dataList = new byte[172 * 320 * 2];
 

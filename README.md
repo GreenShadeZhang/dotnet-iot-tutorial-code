@@ -5,8 +5,12 @@
 
 [文档地址](https://www.waveshare.net/wiki/1.47inch_LCD_Module#.E8.AF.B4.E6.98.8E)
 
+
 ![屏幕图片](/Images/720px-1.47inch-LCD-Module-1.jpg)
 
+实际体验的图片
+
+![测试图片demo](/Images/lcd-demo.png)
 
 ## Pca9685 16路舵机驱动板测试程序
 [文档地址](https://www.waveshare.net/wiki/Servo_Driver_HAT)

@@ -1,4 +1,5 @@
 ﻿using Iot.Device.ST7789V3;
+using LedMatrix.Helpers;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Textures.PixelFormats;
@@ -30,13 +31,16 @@ lcd.SetWindows(0, 0, 172, 320);
 lcd.Clear();
 
 //var imageFilePath = "./Pic/excited.png";
-var imageFilePath = "./Pic/LCD_1inch47.jpg";
+var imageFilePath = "./Pic/excited.png";
 
-var image = Image.Load<Rgb565>(imageFilePath);
 
-var dataList = new byte[172 * 320 * 2];
+var dataList = Helper.ConvertImageToRGB565ByteArray(imageFilePath);
 
-image.CopyPixelDataTo(dataList);
+//var dataList = new byte[172 * 320 * 2];
+
+//var image = Image.Load<Rgb565>(imageFilePath);
+
+//image.CopyPixelDataTo(dataList);
 
 //var image2 = Image.LoadPixelData<Bgr565>(dataList, 172, 320);
 

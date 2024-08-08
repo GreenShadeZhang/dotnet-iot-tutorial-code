@@ -74,5 +74,29 @@ namespace LedMatrix.Helpers
             if (angle == 0) return;
             original.Mutate(x => x.Rotate(angle));
         }
+
+        public static byte[] ConvertImageToRGB565ByteArray(string imagePath)
+        {
+            using (Image<Rgba32> image = Image.Load<Rgba32>(imagePath))
+            {
+                List<ushort> rgb565Pixels = new List<ushort>();
+
+                for (int y = 0; y < image.Height; y++)
+                {
+                    for (int x = 0; x < image.Width; x++)
+                    {
+                        Rgba32 pixel = image[x, y];
+
+                        ushort rgb565Pixel = (ushort)(((pixel.R >> 3) << 11) | ((pixel.G >> 2) << 5) | (pixel.B >> 3));
+                        rgb565Pixels.Add(rgb565Pixel);
+                    }
+                }
+
+                byte[] byteArray = new byte[rgb565Pixels.Count * 2];
+                Buffer.BlockCopy(rgb565Pixels.ToArray(), 0, byteArray, 0, byteArray.Length);
+
+                return byteArray;
+            }
+        }
     }
 }

@@ -98,5 +98,24 @@ namespace LedMatrix.Helpers
                 return byteArray;
             }
         }
+
+        public static byte[] GetImageBytes(Image<Bgr24> image)
+        {
+            int imwidth = image.Width;
+            int imheight = image.Height;
+
+            var pix = new byte[imheight * imwidth * 2];
+            for (int y = 0; y < imheight; y++)
+            {
+                for (int x = 0; x < imwidth; x++)
+                {
+                    var color = image[x, y];
+                    pix[(y * imwidth + x) * 2] = (byte)((color.R & 0xF8) | (color.G >> 5));
+                    pix[(y * imwidth + x) * 2 + 1] = (byte)(((color.G << 3) & 0xE0) | (color.B >> 3));
+                }
+            }
+            return pix;
+        }
+
     }
 }

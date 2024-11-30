@@ -31,10 +31,27 @@ lcd.SetWindows(0, 0, 172, 320);
 lcd.Clear();
 
 //var imageFilePath = "./Pic/excited.png";
-var imageFilePath = "./Pic/excited.png";
+var imageFilePath = "./Pic/LCD_1inch47.jpg";
 
+using (Image<Bgra32> image = Image.Load<Bgra32>(imageFilePath))
+{
+    using (Image<Bgr24> convertedImage = image.CloneAs<Bgr24>())
+    {
+        var dataList = Helper.GetImageBytes(convertedImage);
 
-var dataList = Helper.ConvertImageToRGB565ByteArray(imageFilePath);
+        lcd.SpiWrite(true, new ReadOnlySpan<byte>(dataList));
+
+        Thread.Sleep(3000);
+
+        lcd.Clear();
+
+        Thread.Sleep(3000);
+
+        lcd.SpiWrite(true, new ReadOnlySpan<byte>(dataList));
+    }
+}
+
+//var dataList = Helper.ConvertImageToRGB565ByteArray(imageFilePath);
 
 //var dataList = new byte[172 * 320 * 2];
 
@@ -48,15 +65,15 @@ var dataList = Helper.ConvertImageToRGB565ByteArray(imageFilePath);
 
 //var dataList = image.ImageToRgb565(image.Width, image.Height);
 
-lcd.SpiWrite(true, new ReadOnlySpan<byte>(dataList));
+//lcd.SpiWrite(true, new ReadOnlySpan<byte>(dataList));
 
-Thread.Sleep(3000);
+//Thread.Sleep(3000);
 
-lcd.Clear();
+//lcd.Clear();
 
-Thread.Sleep(3000);
+//Thread.Sleep(3000);
 
-lcd.SpiWrite(true, new ReadOnlySpan<byte>(dataList));
+//lcd.SpiWrite(true, new ReadOnlySpan<byte>(dataList));
 
 //var resultString = $"var bitmap = new byte[] {{{String.Join(",", dataList.Select(b => $"0x{b.ToString("X2")}"))}}}";
 //Console.WriteLine(resultString);

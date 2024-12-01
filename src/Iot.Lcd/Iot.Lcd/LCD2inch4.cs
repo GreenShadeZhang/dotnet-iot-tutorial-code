@@ -89,7 +89,7 @@ public class LCD2inch4 : LcdConfig
         Data(0xA4);
         Data(0xA1);
 
-        Command(0xE0); // Set Gamma
+        Command(0xE0);
         Data(0xD0);
         Data(0x08);
         Data(0x11);

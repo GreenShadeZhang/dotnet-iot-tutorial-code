@@ -4,7 +4,7 @@ using System.Device.Spi;
 
 namespace Iot.Lcd;
 
-public class LcdConfig
+public class LcdConfig: IDisposable
 {
     protected GpioController _gpio;
     protected SpiDevice _spi;
@@ -33,7 +33,7 @@ public class LcdConfig
             spi.ConnectionSettings.Mode = SpiMode.Mode0;
         }
 
-        var pwmChannel = new SoftwarePwmChannel(pinNumber: bl, frequency: bl_freq);
+        using var pwmChannel = new SoftwarePwmChannel(pinNumber: bl, frequency: bl_freq);
         pwmChannel.Start();
     }
 
@@ -89,5 +89,22 @@ public class LcdConfig
         DigitalWrite(DC_PIN, false);
         _gpio.ClosePin(BL_PIN);
         Thread.Sleep(1);
+        _gpio?.Dispose();
+    }
+
+    public void Dispose()
+    {
+        Console.WriteLine("spi end");
+        if (_spi != null)
+        {
+            _spi.Dispose();
+        }
+
+        Console.WriteLine("gpio cleanup...");
+        DigitalWrite(RST_PIN, true);
+        DigitalWrite(DC_PIN, false);
+        _gpio.ClosePin(BL_PIN);
+        Thread.Sleep(1);
+        _gpio?.Dispose();
     }
 }

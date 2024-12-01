@@ -1,4 +1,5 @@
 ﻿using System.Device.Gpio;
+using System.Device.Pwm.Drivers;
 using System.Device.Spi;
 
 namespace Iot.Lcd;
@@ -31,6 +32,9 @@ public class LcdConfig
             spi.ConnectionSettings.ClockFrequency = spi_freq;
             spi.ConnectionSettings.Mode = SpiMode.Mode0;
         }
+
+        var pwmChannel = new SoftwarePwmChannel(pinNumber: bl, frequency: bl_freq);
+        pwmChannel.Start();
     }
 
     public void DigitalWrite(int pin, bool value)

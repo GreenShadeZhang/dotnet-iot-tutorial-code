@@ -4,10 +4,11 @@ using System.Device.Spi;
 
 namespace Iot.Lcd;
 
-public class LcdConfig: IDisposable
+public class LcdConfig : IDisposable
 {
     protected GpioController _gpio;
     protected SpiDevice _spi;
+    protected SoftwarePwmChannel _pwmBacklight;
     protected int RST_PIN;
     protected int DC_PIN;
     protected int BL_PIN;
@@ -33,8 +34,8 @@ public class LcdConfig: IDisposable
             spi.ConnectionSettings.Mode = SpiMode.Mode0;
         }
 
-        using var pwmChannel = new SoftwarePwmChannel(pinNumber: bl, frequency: bl_freq);
-        pwmChannel.Start();
+        _pwmBacklight = new SoftwarePwmChannel(pinNumber: bl, frequency: bl_freq);
+        _pwmBacklight.Start();
     }
 
     public void DigitalWrite(int pin, bool value)
@@ -59,11 +60,13 @@ public class LcdConfig: IDisposable
 
     public void BlDutyCycle(double duty)
     {
+        _pwmBacklight.DutyCycle = duty / 100;
         // Implement PWM control for backlight if needed
     }
 
     public void BlFrequency(int freq)
     {
+        _pwmBacklight.Frequency = freq;
         // Implement frequency control for backlight if needed
     }
 

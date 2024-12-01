@@ -2,6 +2,7 @@
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using System.Device.Spi;
+using Verdure.Iot.Device;
 
 string inputPath = "LCD_2inch4.jpg";
 

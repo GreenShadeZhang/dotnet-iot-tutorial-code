@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ST7789V3.Samples", "src\ST7
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Iot.Lcd", "src\Iot.Lcd\Iot.Lcd\Iot.Lcd.csproj", "{68D48EA2-1461-4F68-98C9-A15E098627DB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Verdure.Iot.Device", "src\Verdure.Iot.Device\Verdure.Iot.Device.csproj", "{4BA24AE3-6EB1-4362-88BD-913D1CD52E67}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{A5139A99-41C9-4808-A175-7D83D860F646}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,9 +31,17 @@ Global
 		{68D48EA2-1461-4F68-98C9-A15E098627DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{68D48EA2-1461-4F68-98C9-A15E098627DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{68D48EA2-1461-4F68-98C9-A15E098627DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4BA24AE3-6EB1-4362-88BD-913D1CD52E67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4BA24AE3-6EB1-4362-88BD-913D1CD52E67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4BA24AE3-6EB1-4362-88BD-913D1CD52E67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4BA24AE3-6EB1-4362-88BD-913D1CD52E67}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{16DB7ED5-42B6-475B-882E-9CA9ACAEF02C} = {A5139A99-41C9-4808-A175-7D83D860F646}
+		{68D48EA2-1461-4F68-98C9-A15E098627DB} = {A5139A99-41C9-4808-A175-7D83D860F646}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5B15746B-2C90-40D5-A8AE-AE81B6B7766F}

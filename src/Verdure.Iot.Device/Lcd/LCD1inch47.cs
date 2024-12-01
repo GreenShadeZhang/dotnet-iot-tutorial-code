@@ -2,7 +2,7 @@
 using SixLabors.ImageSharp.PixelFormats;
 using System.Device.Spi;
 
-namespace Iot.Lcd;
+namespace Verdure.Iot.Device;
 public class LCD1inch47 : LcdConfig
 {
     public const int Width = 240;

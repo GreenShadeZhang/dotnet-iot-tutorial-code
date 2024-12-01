@@ -2,7 +2,7 @@
 using System.Device.Pwm.Drivers;
 using System.Device.Spi;
 
-namespace Iot.Lcd;
+namespace Verdure.Iot.Device;
 
 public class LcdConfig : IDisposable
 {

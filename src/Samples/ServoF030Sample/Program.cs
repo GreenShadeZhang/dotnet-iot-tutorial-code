@@ -1,16 +1,39 @@
 ﻿using System.Device.I2c;
-using Verdure.Iot.Device.ServoF030;
 
-var angle = new JointStatus()
+try
 {
-    Id = 2
-};
-using I2cDevice i2c = I2cDevice.Create(new I2cConnectionSettings(1, 0x02));
-using var driver = new ServoF030(i2c);
-driver.SetJointEnable(angle, true);
-Console.WriteLine($"Angle: {angle.Angle}");
-driver.UpdateServoAngle(angle, 90);
-Console.WriteLine($"Angle: {angle.Angle}");
-driver.GetServoAngle(angle);
-Console.WriteLine($"Angle: {angle.Angle}");
+    while (true)
+    {
+        using I2cDevice i2c = I2cDevice.Create(new I2cConnectionSettings(1, 0x06));
+        byte[] writeBuffer = new byte[5] { 0xff, 0x01, 0x00, 0x00, 0x00 };
+        byte[] receiveData = new byte[5];
+        i2c.WriteRead(writeBuffer, receiveData);
+        Console.WriteLine($"I2C 设备连接成功--{DateTime.Now.ToString("s")}");
+        foreach (var data in receiveData)
+        {
+            Console.Write($"{data}, ");
+        }
+        Console.WriteLine();
+        Thread.Sleep(500);
+    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"I2C 设备连接失败: {ex.Message}");
+}
+
+//var angle = new JointStatus()
+//{
+//    Id = 2
+//};
+
+//using I2cDevice i2c = I2cDevice.Create(new I2cConnectionSettings(1, 0x02));
+//using var driver = new ServoF030(i2c);
+//driver.SetJointEnable(angle, true);
+
+//Console.WriteLine($"Angle: {angle.Angle}");
+//driver.UpdateServoAngle(angle, 90);
+//Console.WriteLine($"Angle: {angle.Angle}");
+//driver.GetServoAngle(angle);
+//Console.WriteLine($"Angle: {angle.Angle}");
 Console.ReadLine();

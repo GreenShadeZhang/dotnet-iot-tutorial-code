@@ -68,17 +68,23 @@ namespace Verdure.Iot.Device.ServoF030
             int retryCount = 2;
             bool success = false;
 
+            Console.WriteLine($"adress:{_i2cDevice.ConnectionSettings.DeviceAddress}");
+
+
             // 发送数据
             while (retryCount > 0)
             {
                 try
                 {
                     _i2cDevice.Write(i2cTxData);
+                    Console.WriteLine($"I2C write to joint {jointId} success");
                     success = true;
                     break;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Console.WriteLine(ex.StackTrace);
+                    Console.WriteLine(ex.Message);
                     retryCount--;
                 }
             }
@@ -100,11 +106,14 @@ namespace Verdure.Iot.Device.ServoF030
                 try
                 {
                     _i2cDevice.Read(i2cRxData);
+                    Console.WriteLine("read ok");
                     success = true;
                     break;
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    Console.WriteLine(ex.StackTrace);
+                    Console.WriteLine(ex.Message);
                     retryCount--;
                 }
             }

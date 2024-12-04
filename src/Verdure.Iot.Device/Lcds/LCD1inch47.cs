@@ -5,9 +5,9 @@ using System.Device.Spi;
 namespace Verdure.Iot.Device;
 public class LCD1inch47 : LcdConfig
 {
-    public const int Width = 240;
+    public const int Width = 172;
     public const int Height = 320;
-    public LCD1inch47(SpiDevice spi) : base(spi, 40000000, 27, 25, 18, 1000)
+    public LCD1inch47(SpiDevice spi, int spiFreq = 40000000, int rst = 27, int dc = 25, int bl = 18, int blFreq = 1000) : base(spi, spiFreq, rst, dc, bl, blFreq)
     {
     }
     public void Command(byte cmd)
@@ -155,7 +155,17 @@ public class LCD1inch47 : LcdConfig
         }
         else
         {
-          
+
+        }
+    }
+
+    public void ShowImageBytes(byte[] pix)
+    {
+        SetWindows(0, 0, Width, Height);
+        DigitalWrite(DC_PIN, true);
+        for (int i = 0; i < pix.Length; i += 4096)
+        {
+            SpiWriteByte(pix.AsSpan(i, Math.Min(4096, pix.Length - i)).ToArray());
         }
     }
 

@@ -14,14 +14,14 @@ public class LcdConfig : IDisposable
     protected int BL_PIN;
     protected int BL_freq;
 
-    public LcdConfig(SpiDevice spi, int spi_freq = 40000000, int rst = 27, int dc = 25, int bl = 18, int bl_freq = 1000)
+    public LcdConfig(SpiDevice spi, int spiFreq = 40000000, int rst = 27, int dc = 25, int bl = 18, int blFreq = 1000)
     {
         _gpio = new GpioController();
         this._spi = spi;
         this.RST_PIN = rst;
         this.DC_PIN = dc;
         this.BL_PIN = bl;
-        this.BL_freq = bl_freq;
+        this.BL_freq = blFreq;
 
         _gpio.OpenPin(RST_PIN, PinMode.Output);
         _gpio.OpenPin(DC_PIN, PinMode.Output);
@@ -30,11 +30,11 @@ public class LcdConfig : IDisposable
 
         if (spi != null)
         {
-            spi.ConnectionSettings.ClockFrequency = spi_freq;
+            spi.ConnectionSettings.ClockFrequency = spiFreq;
             spi.ConnectionSettings.Mode = SpiMode.Mode0;
         }
 
-        _pwmBacklight = new SoftwarePwmChannel(pinNumber: bl, frequency: bl_freq);
+        _pwmBacklight = new SoftwarePwmChannel(pinNumber: bl, frequency: blFreq);
         _pwmBacklight.Start();
     }
 

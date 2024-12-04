@@ -10,6 +10,9 @@
 	  <ProjectReference Include="..\..\Verdure.Iot.Device\Verdure.Iot.Device.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+	  <None Update="LCD_1inch47.jpg">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	  <None Update="LCD_2inch4.jpg">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>

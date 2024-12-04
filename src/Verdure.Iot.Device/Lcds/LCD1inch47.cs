@@ -80,6 +80,8 @@ public class LCD1inch47 : LcdConfig
         Data(0xF0);
         Data(0x00);
         Data(0x04);
+        Data(0x04);
+        Data(0x04);
         Data(0x05);
         Data(0x29);
         Data(0x33);
@@ -101,6 +103,7 @@ public class LCD1inch47 : LcdConfig
         Data(0x33);
         Data(0x3E);
         Data(0x36);
+        Data(0x14);
         Data(0x14);
         Data(0x29);
         Data(0x32);
@@ -133,29 +136,21 @@ public class LCD1inch47 : LcdConfig
     {
         int imwidth = image.Width;
         int imheight = image.Height;
-
-        if (imwidth == Height && imheight == Width)
+        var pix = new byte[imheight * imwidth * 2];
+        for (int y = 0; y < imheight; y++)
         {
-            var pix = new byte[imheight * imwidth * 2];
-            for (int y = 0; y < imheight; y++)
+            for (int x = 0; x < imwidth; x++)
             {
-                for (int x = 0; x < imwidth; x++)
-                {
-                    var color = image[x, y];
-                    pix[(y * imwidth + x) * 2] = (byte)((color.R & 0xF8) | (color.G >> 5));
-                    pix[(y * imwidth + x) * 2 + 1] = (byte)(((color.G << 3) & 0xE0) | (color.B >> 3));
-                }
-            }
-            SetWindows(0, 0, Width, Height);
-            DigitalWrite(DC_PIN, true);
-            for (int i = 0; i < pix.Length; i += 4096)
-            {
-                SpiWriteByte(pix.AsSpan(i, Math.Min(4096, pix.Length - i)).ToArray());
+                var color = image[x, y];
+                pix[(y * imwidth + x) * 2] = (byte)((color.R & 0xF8) | (color.G >> 5));
+                pix[(y * imwidth + x) * 2 + 1] = (byte)(((color.G << 3) & 0xE0) | (color.B >> 3));
             }
         }
-        else
+        SetWindows(0, 0, Width, Height);
+        DigitalWrite(DC_PIN, true);
+        for (int i = 0; i < pix.Length; i += 4096)
         {
-
+            SpiWriteByte(pix.AsSpan(i, Math.Min(4096, pix.Length - i)).ToArray());
         }
     }
 

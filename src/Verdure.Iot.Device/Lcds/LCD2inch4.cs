@@ -1,5 +1,6 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using System.Device.Pwm.Drivers;
 using System.Device.Spi;
 
 namespace Verdure.Iot.Device;
@@ -7,7 +8,7 @@ public class LCD2inch4 : LcdConfig
 {
     public const int Width = 240;
     public const int Height = 320;
-    public LCD2inch4(SpiDevice spi, int spiFreq = 40000000, int rst = 27, int dc = 25, int bl = 18, int blFreq = 1000) : base(spi, spiFreq, rst, dc, bl, blFreq)
+    public LCD2inch4(SpiDevice spi, SoftwarePwmChannel pwmBacklight, int spiFreq = 40000000, int rst = 27, int dc = 25, int bl = 18, int blFreq = 1000) : base(spi, pwmBacklight, spiFreq, rst, dc, bl, blFreq)
     {
     }
     public void Command(byte cmd)
@@ -34,9 +35,6 @@ public class LCD2inch4 : LcdConfig
 
     public void Init()
     {
-        ModuleInit();
-        Reset();
-
         Command(0x36);
         Data(0x00);
 

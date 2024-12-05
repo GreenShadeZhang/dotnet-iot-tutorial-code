@@ -14,7 +14,7 @@ public class LcdConfig : IDisposable
     protected int BL_PIN;
     protected int BL_freq;
 
-    public LcdConfig(SpiDevice spi, int spiFreq = 40000000, int rst = 27, int dc = 25, int bl = 18, int blFreq = 1000)
+    public LcdConfig(SpiDevice spi, SoftwarePwmChannel pwmBacklight, int spiFreq = 40000000, int rst = 27, int dc = 25, int bl = 18, int blFreq = 1000)
     {
         _gpio = new GpioController();
         this._spi = spi;
@@ -34,8 +34,7 @@ public class LcdConfig : IDisposable
             spi.ConnectionSettings.Mode = SpiMode.Mode0;
         }
 
-        _pwmBacklight = new SoftwarePwmChannel(pinNumber: bl, frequency: blFreq);
-        _pwmBacklight.Start();
+        _pwmBacklight = pwmBacklight;
     }
 
     public void DigitalWrite(int pin, bool value)
@@ -68,31 +67,6 @@ public class LcdConfig : IDisposable
     {
         _pwmBacklight.Frequency = freq;
         // Implement frequency control for backlight if needed
-    }
-
-    public void ModuleInit()
-    {
-        if (_spi != null)
-        {
-            _spi.ConnectionSettings.ClockFrequency = _spi.ConnectionSettings.ClockFrequency;
-            _spi.ConnectionSettings.Mode = SpiMode.Mode0;
-        }
-    }
-
-    public void ModuleExit()
-    {
-        Console.WriteLine("spi end");
-        if (_spi != null)
-        {
-            _spi.Dispose();
-        }
-
-        Console.WriteLine("gpio cleanup...");
-        DigitalWrite(RST_PIN, true);
-        DigitalWrite(DC_PIN, false);
-        _gpio.ClosePin(BL_PIN);
-        Thread.Sleep(1);
-        _gpio?.Dispose();
     }
 
     public void Dispose()

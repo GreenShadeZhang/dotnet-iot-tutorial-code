@@ -25,7 +25,7 @@ using SpiDevice sender1inch47Device = SpiDevice.Create(new SpiConnectionSettings
 });
 
 using var inch24 = new LCD2inch4(sender2inch4Device, pwmBacklight);
-//inch24.Reset();
+inch24.Reset();
 inch24.Init();
 inch24.Clear();
 inch24.BlDutyCycle(50);

@@ -6,27 +6,20 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\ST7789V3\ST7789V3\ST7789V3.csproj" />
-  </ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.5" />
+	  <ProjectReference Include="..\..\Verdure.Iot.Device\Verdure.Iot.Device.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-	  <None Update="Pic\excited.png">
+	  <None Update="excited.png">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Pic\LCD_1inch47.jpg">
+	  <None Update="LCD_1inch47.jpg">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Pic\LCD_2inch.jpg">
+	  <None Update="LCD_2inch.jpg">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
-	  <None Update="Pic\verdure.png">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Pic\verdure90.png">
+	  <None Update="LCD_2inch4.jpg">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>

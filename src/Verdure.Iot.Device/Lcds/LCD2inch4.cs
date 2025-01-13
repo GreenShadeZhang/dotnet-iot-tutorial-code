@@ -1,28 +1,26 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using System.Device.Pwm.Drivers;
 using System.Device.Spi;
 
-namespace Iot.Lcd;
+namespace Verdure.Iot.Device;
 public class LCD2inch4 : LcdConfig
 {
     public const int Width = 240;
     public const int Height = 320;
-
-    private readonly SpiDevice _spi;
-    public LCD2inch4(SpiDevice spi) : base(spi, 40000000, 27, 25, 18, 1000)
+    public LCD2inch4(SpiDevice spi, SoftwarePwmChannel pwmBacklight, int spiFreq = 40000000, int rst = 27, int dc = 25, int bl = 18, int blFreq = 1000) : base(spi, pwmBacklight, spiFreq, rst, dc, bl, blFreq)
     {
-        _spi = spi;
     }
     public void Command(byte cmd)
     {
         DigitalWrite(DC_PIN, false);
-        SpiWriteByte(new byte[] { cmd });
+        SpiWriteByte([cmd]);
     }
 
     public void Data(byte val)
     {
         DigitalWrite(DC_PIN, true);
-        SpiWriteByte(new byte[] { val });
+        SpiWriteByte([val]);
     }
 
     public void Reset()
@@ -37,95 +35,95 @@ public class LCD2inch4 : LcdConfig
 
     public void Init()
     {
-        ModuleInit();
-        Reset();
+        Command(0x36);
+        Data(0x00);
 
-        Command(0x11); // Sleep out
-
-        Command(0xCF);
-        Data(0x00);
-        Data(0xC1);
-        Data(0x30);
-        Command(0xED);
-        Data(0x64);
-        Data(0x03);
-        Data(0x12);
-        Data(0x81);
-        Command(0xE8);
-        Data(0x85);
-        Data(0x00);
-        Data(0x79);
-        Command(0xCB);
-        Data(0x39);
-        Data(0x2C);
-        Data(0x00);
-        Data(0x34);
-        Data(0x02);
-        Command(0xF7);
-        Data(0x20);
-        Command(0xEA);
-        Data(0x00);
-        Data(0x00);
-        Command(0xC0); // Power control
-        Data(0x1D); // VRH[5:0]
-        Command(0xC1); // Power control
-        Data(0x12); // SAP[2:0]; BT[3:0]
-        Command(0xC5); // VCM control
-        Data(0x33);
-        Data(0x3F);
-        Command(0xC7); // VCM control
-        Data(0x92);
-        Command(0x3A); // Memory Access Control
-        Data(0x55);
-        Command(0x36); // Memory Access Control
-        Data(0x08);
-        Command(0xB1);
-        Data(0x00);
-        Data(0x12);
-        Command(0xB6); // Display Function Control
-        Data(0x0A);
-        Data(0xA2);
-
-        Command(0x44);
-        Data(0x02);
-
-        Command(0xF2); // 3Gamma Function Disable
-        Data(0x00);
-        Command(0x26); // Gamma curve selected
-        Data(0x01);
-        Command(0xE0); // Set Gamma
-        Data(0x0F);
-        Data(0x22);
-        Data(0x1C);
-        Data(0x1B);
-        Data(0x08);
-        Data(0x0F);
-        Data(0x48);
-        Data(0xB8);
-        Data(0x34);
+        Command(0x3A);
         Data(0x05);
+
+        Command(0x21);
+
+        Command(0x2A);
+        Data(0x00);
+        Data(0x00);
+        Data(0x01);
+        Data(0x3F);
+
+        Command(0x2B);
+        Data(0x00);
+        Data(0x00);
+        Data(0x00);
+        Data(0xEF);
+
+        Command(0xB2);
         Data(0x0C);
-        Data(0x09);
+        Data(0x0C);
+        Data(0x00);
+        Data(0x33);
+        Data(0x33);
+
+        Command(0xB7);
+        Data(0x35);
+
+        Command(0xBB);
+        Data(0x1F);
+
+        Command(0xC0);
+        Data(0x2C);
+
+        Command(0xC2);
+        Data(0x01);
+
+        Command(0xC3);
+        Data(0x12);
+
+        Command(0xC4);
+        Data(0x20);
+
+        Command(0xC6);
         Data(0x0F);
-        Data(0x07);
-        Data(0x00);
-        Command(0xE1); // Set Gamma
-        Data(0x00);
-        Data(0x23);
-        Data(0x24);
-        Data(0x07);
-        Data(0x10);
-        Data(0x07);
-        Data(0x38);
-        Data(0x47);
-        Data(0x4B);
-        Data(0x0A);
+
+        Command(0xD0);
+        Data(0xA4);
+        Data(0xA1);
+
+        Command(0xE0);
+        Data(0xD0);
+        Data(0x08);
+        Data(0x11);
+        Data(0x08);
+        Data(0x0C);
+        Data(0x15);
+        Data(0x39);
+        Data(0x33);
+        Data(0x50);
+        Data(0x36);
         Data(0x13);
+        Data(0x14);
+        Data(0x29);
+        Data(0x2D);
+
+        Command(0xE1);
+        Data(0xD0);
+        Data(0x08);
+        Data(0x10);
+        Data(0x08);
         Data(0x06);
-        Data(0x30);
-        Data(0x38);
-        Data(0x0F);
-        Command(0x29); // Display on
+        Data(0x06);
+        Data(0x39);
+        Data(0x44);
+        Data(0x51);
+        Data(0x0B);
+        Data(0x16);
+        Data(0x14);
+        Data(0x2F);
+        Data(0x31);
+
+        Command(0x21);
+
+        Command(0x11);
+
+        Command(0x29);
     }
 
     public void SetWindows(int Xstart, int Ystart, int Xend, int Yend)
@@ -164,7 +162,7 @@ public class LCD2inch4 : LcdConfig
             }
 
             Command(0x36);
-            Data(0x78);
+            Data(0x70);
             SetWindows(0, 0, Width, Height);
             DigitalWrite(DC_PIN, true);
             for (int i = 0; i < pix.Length; i += 4096)
@@ -186,13 +184,23 @@ public class LCD2inch4 : LcdConfig
             }
 
             Command(0x36);
-            Data(0x08);
+            Data(0x00);
             SetWindows(0, 0, Width, Height);
             DigitalWrite(DC_PIN, true);
             for (int i = 0; i < pix.Length; i += 4096)
             {
                 SpiWriteByte(pix.AsSpan(i, Math.Min(4096, pix.Length - i)).ToArray());
             }
+        }
+    }
+
+    public void ShowImageBytes(byte[] pix)
+    {
+        SetWindows(0, 0, Width, Height);
+        DigitalWrite(DC_PIN, true);
+        for (int i = 0; i < pix.Length; i += 4096)
+        {
+            SpiWriteByte(pix.AsSpan(i, Math.Min(4096, pix.Length - i)).ToArray());
         }
     }
 

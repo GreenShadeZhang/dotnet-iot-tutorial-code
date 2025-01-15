@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServoF030Sample", "src\Samp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServoF030Reset", "src\Samples\ServoF030Reset\ServoF030Reset.csproj", "{BB7B3802-8D08-411D-950A-1E61611581B5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Verdure.LottieToImage", "src\Samples\LottieToImage\Verdure.LottieToImage.csproj", "{A0274131-1830-444E-98BE-85D9D6B4C811}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{BB7B3802-8D08-411D-950A-1E61611581B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB7B3802-8D08-411D-950A-1E61611581B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB7B3802-8D08-411D-950A-1E61611581B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0274131-1830-444E-98BE-85D9D6B4C811}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0274131-1830-444E-98BE-85D9D6B4C811}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0274131-1830-444E-98BE-85D9D6B4C811}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0274131-1830-444E-98BE-85D9D6B4C811}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -63,6 +69,7 @@ Global
 		{4FB50687-FAA0-42D3-A2AC-38EF1D611BC4} = {A5139A99-41C9-4808-A175-7D83D860F646}
 		{C6EA9825-DEE5-4305-8D87-D40357F7BBD8} = {A5139A99-41C9-4808-A175-7D83D860F646}
 		{BB7B3802-8D08-411D-950A-1E61611581B5} = {A5139A99-41C9-4808-A175-7D83D860F646}
+		{A0274131-1830-444E-98BE-85D9D6B4C811} = {A5139A99-41C9-4808-A175-7D83D860F646}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5B15746B-2C90-40D5-A8AE-AE81B6B7766F}

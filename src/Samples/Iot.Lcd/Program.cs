@@ -11,7 +11,7 @@ pwmBacklight.Start();
 
 string input2inch4Path = "LCD_2inch4.jpg";
 
-string input1inch47Path = "LCD_1inch47.jpg";
+string input1inch47Path = "verdure901.png";
 
 using SpiDevice sender2inch4Device = SpiDevice.Create(new SpiConnectionSettings(0, 0)
 {
@@ -66,7 +66,7 @@ while (true)
     Console.WriteLine("2inch41 Done");
 
 
-    using (Image<Bgra32> image1inch471 = Image.Load<Bgra32>("excited.png"))
+    using (Image<Bgra32> image1inch471 = Image.Load<Bgra32>("verdure901.png"))
     {
         using Image<Bgr24> converted1inch47Image1 = image1inch471.CloneAs<Bgr24>();
         inch147.ShowImage(converted1inch47Image1);

@@ -24,7 +24,7 @@ try
             writeBuffer[0] = 0x01;
             Array.Copy(angleBytes, 0, writeBuffer, 1, angleBytes.Length);
 
-            //i2c.WriteRead(writeBuffer, receiveData);
+            i2c.WriteRead(writeBuffer, receiveData);
             i2c8.WriteRead(writeBuffer, receiveData);
             Thread.Sleep(20);
         }
@@ -37,7 +37,7 @@ try
             writeBuffer[0] = 0x01;
             Array.Copy(angleBytes, 0, writeBuffer, 1, angleBytes.Length);
 
-           // i2c.WriteRead(writeBuffer, receiveData);
+           i2c.WriteRead(writeBuffer, receiveData);
             i2c8.WriteRead(writeBuffer, receiveData);
             Thread.Sleep(20);
         }

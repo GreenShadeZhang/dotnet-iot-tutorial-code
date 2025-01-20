@@ -7,7 +7,7 @@ namespace Verdure.LottieToImage;
 
 public class LottieToImage
 {
-    public static Image<Rgba32> RenderLottieFrame(Animation animation, double progress, int width, int height)
+    public static Image<Bgra32> RenderLottieFrame(Animation animation, double progress, int width, int height)
     {
 
         // 创建SKSurface用于渲染
@@ -27,7 +27,7 @@ public class LottieToImage
 
         // 转换为ImageSharp格式
         using var memStream = new MemoryStream(bytes);
-        return Image.Load<Rgba32>(memStream);
+        return Image.Load<Bgra32>(memStream);
     }
 
     public static async Task SaveLottieFramesAsync(string lottieJsonPath, string outputDir, int width, int height)

@@ -151,10 +151,29 @@ public class LCD1inch47 : LcdConfig
             SpiWriteByte(pix.AsSpan(i, Math.Min(4096, pix.Length - i)).ToArray());
         }
     }
+    public void ShowImageData(Image<Bgr24> image, int xStart = 0, int yStart = 0)
+    {
+        int imwidth = image.Width;
+        int imheight = image.Height;
+        var pix = new byte[imheight * imwidth * 2];
+        for (int y = 0; y < imheight; y++)
+        {
+            for (int x = 0; x < imwidth; x++)
+            {
+                var color = image[x, y];
+                pix[(y * imwidth + x) * 2] = (byte)((color.R & 0xF8) | (color.G >> 5));
+                pix[(y * imwidth + x) * 2 + 1] = (byte)(((color.G << 3) & 0xE0) | (color.B >> 3));
+            }
+        }
+        DigitalWrite(DC_PIN, true);
+        for (int i = 0; i < pix.Length; i += 4096)
+        {
+            SpiWriteByte(pix.AsSpan(i, Math.Min(4096, pix.Length - i)).ToArray());
+        }
+    }
 
     public void ShowImageBytes(byte[] pix)
     {
-        SetWindows(0, 0, Width, Height);
         DigitalWrite(DC_PIN, true);
         for (int i = 0; i < pix.Length; i += 4096)
         {

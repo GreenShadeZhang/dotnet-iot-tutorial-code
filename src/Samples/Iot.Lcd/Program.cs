@@ -15,12 +15,12 @@ string input1inch47Path = "verdure901.png";
 
 using SpiDevice sender2inch4Device = SpiDevice.Create(new SpiConnectionSettings(0, 0)
 {
-    ClockFrequency = 40000000,
+    ClockFrequency = 50000000,
     Mode = SpiMode.Mode0
 });
 using SpiDevice sender1inch47Device = SpiDevice.Create(new SpiConnectionSettings(0, 1)
 {
-    ClockFrequency = 40000000,
+    ClockFrequency = 50000000,
     Mode = SpiMode.Mode0
 });
 
@@ -47,7 +47,7 @@ while (true)
         using Image<Bgr24> converted2inch4Image = image2inch4.CloneAs<Bgr24>();
         inch24.ShowImageData(converted2inch4Image);
     }
-
+    await Task.Delay(50);
     Console.WriteLine("2inch4 Done");
 
 
@@ -56,24 +56,24 @@ while (true)
         using Image<Bgr24> converted1inch47Image = image1inch47.CloneAs<Bgr24>();
         inch147.ShowImageData(converted1inch47Image);
     }
-
+    await Task.Delay(50);
     Console.WriteLine("1inch47 Done");
 
-    using (Image<Bgra32> image2inch41 = Image.Load<Bgra32>(input2inch4Path))
-    {
-        using Image<Bgr24> converted2inch4Image1 = image2inch41.CloneAs<Bgr24>();
-        inch24.ShowImageData(converted2inch4Image1);
-    }
+    //using (Image<Bgra32> image2inch41 = Image.Load<Bgra32>(input2inch4Path))
+    //{
+    //    using Image<Bgr24> converted2inch4Image1 = image2inch41.CloneAs<Bgr24>();
+    //    inch24.ShowImageData(converted2inch4Image1);
+    //}
 
-    Console.WriteLine("2inch41 Done");
+    //Console.WriteLine("2inch41 Done");
 
 
-    using (Image<Bgra32> image1inch471 = Image.Load<Bgra32>("verdure901.png"))
-    {
-        using Image<Bgr24> converted1inch47Image1 = image1inch471.CloneAs<Bgr24>();
-        inch147.ShowImageData(converted1inch47Image1);
-    }
+    //using (Image<Bgra32> image1inch471 = Image.Load<Bgra32>("verdure901.png"))
+    //{
+    //    using Image<Bgr24> converted1inch47Image1 = image1inch471.CloneAs<Bgr24>();
+    //    inch147.ShowImageData(converted1inch47Image1);
+    //}
 
-    Console.WriteLine("1inch471 Done");
+    //Console.WriteLine("1inch471 Done");
 }
 //Console.ReadLine();

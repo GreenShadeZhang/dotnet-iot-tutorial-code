@@ -24,14 +24,32 @@ var pwmChannel = new SoftwarePwmChannel(pinNumber: backlightPin, frequency: blFr
 
 var lcd = new ST7789V3(dataCommandPin, senderDevice, resetPin, pwmChannel, shouldDispose: false);
 
+// SPI0 CS0
+SpiConnectionSettings senderSettings1 = new(0, 1)
+{
+    ClockFrequency = ST7789V3.SpiClockFrequency,
+    Mode = ST7789V3.SpiMode
+};
+
+using SpiDevice senderDevice1 = SpiDevice.Create(senderSettings1);
+
+
+var lcd1 = new ST7789V3(dataCommandPin, senderDevice1, resetPin, pwmChannel, shouldDispose: false);
+
 lcd.Reset();
 lcd.Init();
 lcd.SetWindows(0, 0, 172, 320);
 
 lcd.Clear();
 
-//var imageFilePath = "./Pic/excited.png";
-var imageFilePath = "./Pic/LCD_1inch47.jpg";
+//lcd1.Reset();
+lcd1.Init();
+lcd1.SetWindows(0, 0, 172, 320);
+
+lcd1.Clear();
+
+var imageFilePath = "./Pic/excited.png";
+//var imageFilePath = "./Pic/LCD_1inch47.jpg";
 
 using (Image<Bgra32> image = Image.Load<Bgra32>(imageFilePath))
 {
@@ -39,15 +57,20 @@ using (Image<Bgra32> image = Image.Load<Bgra32>(imageFilePath))
     {
         var dataList = Helper.GetImageBytes(convertedImage);
 
-        lcd.SpiWrite(true, new ReadOnlySpan<byte>(dataList));
+        while (true)
+        {
+            lcd.SpiWrite(true, new ReadOnlySpan<byte>(dataList));
+            lcd1.SpiWrite(true, new ReadOnlySpan<byte>(dataList));
+        }
+        //lcd.SpiWrite(true, new ReadOnlySpan<byte>(dataList));
 
-        Thread.Sleep(3000);
+        //Thread.Sleep(3000);
 
-        lcd.Clear();
+        //lcd.Clear();
 
-        Thread.Sleep(3000);
+        //Thread.Sleep(3000);
 
-        lcd.SpiWrite(true, new ReadOnlySpan<byte>(dataList));
+        //lcd.SpiWrite(true, new ReadOnlySpan<byte>(dataList));
     }
 }
 

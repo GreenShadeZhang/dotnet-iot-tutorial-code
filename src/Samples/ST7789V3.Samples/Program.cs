@@ -48,7 +48,7 @@ lcd1.SetWindows(0, 0, 172, 320);
 
 lcd1.Clear();
 
-var imageFilePath = "./Pic/excited.png";
+var imageFilePath = "verdure90.png";
 //var imageFilePath = "./Pic/LCD_1inch47.jpg";
 
 using (Image<Bgra32> image = Image.Load<Bgra32>(imageFilePath))

@@ -231,7 +231,7 @@ public class LCD2inch4 : LcdConfig
                 }
             }
 
-            DigitalWrite(DC_PIN, true);
+            //DigitalWrite(DC_PIN, true);
             for (int i = 0; i < pix.Length; i += 4096)
             {
                 SpiWriteByte(pix.AsSpan(i, Math.Min(4096, pix.Length - i)).ToArray());

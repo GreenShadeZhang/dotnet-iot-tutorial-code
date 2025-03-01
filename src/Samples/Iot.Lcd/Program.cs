@@ -39,26 +39,34 @@ inch147.SetWindows(0, 0, LCD1inch47.Width, LCD1inch47.Height);
 inch147.Clear();
 inch147.BlDutyCycle(50);
 
+byte[] data1 = [];
+
+byte[] data2 = [];
+
+using (Image<Bgra32> image2inch4 = Image.Load<Bgra32>("LCD_2inch.jpg"))
+{
+    image2inch4.Mutate(x => x.Rotate(90));
+    using Image<Bgr24> converted2inch4Image = image2inch4.CloneAs<Bgr24>();
+    data1 = inch24.GetImageBytes(converted2inch4Image);
+}
+//await Task.Delay(50);
+Console.WriteLine("2inch4 Done");
+
+
+using (Image<Bgra32> image1inch47 = Image.Load<Bgra32>(input1inch47Path))
+{
+    using Image<Bgr24> converted1inch47Image = image1inch47.CloneAs<Bgr24>();
+    //inch147.ShowImageData(converted1inch47Image);
+    data2 = inch147.GetImageBytes(converted1inch47Image);
+}
+//await Task.Delay(50);
+Console.WriteLine("1inch47 Done");
+
 while (true)
 {
-    using (Image<Bgra32> image2inch4 = Image.Load<Bgra32>("LCD_2inch.jpg"))
-    {
-        image2inch4.Mutate(x => x.Rotate(90));
-        using Image<Bgr24> converted2inch4Image = image2inch4.CloneAs<Bgr24>();
-        inch24.ShowImageData(converted2inch4Image);
-    }
-    await Task.Delay(50);
-    Console.WriteLine("2inch4 Done");
+    inch24.ShowImageBytes(data1);
 
-
-    using (Image<Bgra32> image1inch47 = Image.Load<Bgra32>(input1inch47Path))
-    {
-        using Image<Bgr24> converted1inch47Image = image1inch47.CloneAs<Bgr24>();
-        inch147.ShowImageData(converted1inch47Image);
-    }
-    await Task.Delay(50);
-    Console.WriteLine("1inch47 Done");
-
+    inch147.ShowImageBytes(data2);
     //using (Image<Bgra32> image2inch41 = Image.Load<Bgra32>(input2inch4Path))
     //{
     //    using Image<Bgr24> converted2inch4Image1 = image2inch41.CloneAs<Bgr24>();

@@ -1,5 +1,6 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using System.Device.Gpio;
 using System.Device.Pwm.Drivers;
 using System.Device.Spi;
 
@@ -8,7 +9,7 @@ public class LCD1inch47 : LcdConfig
 {
     public const int Width = 172;
     public const int Height = 320;
-    public LCD1inch47(SpiDevice spi, SoftwarePwmChannel pwmBacklight, int spiFreq = 40000000, int rst = 27, int dc = 25, int bl = 18, int blFreq = 1000) : base(spi, pwmBacklight, spiFreq, rst, dc, bl, blFreq)
+    public LCD1inch47(SpiDevice spi, SoftwarePwmChannel pwmBacklight, GpioController gpio, int spiFreq = 40000000, int rst = 27, int dc = 25, int bl = 18, int blFreq = 1000) : base(spi, pwmBacklight, gpio, spiFreq, rst, dc, bl, blFreq)
     {
     }
     public void Command(byte cmd)

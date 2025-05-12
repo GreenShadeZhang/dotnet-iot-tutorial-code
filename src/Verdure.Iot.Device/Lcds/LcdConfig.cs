@@ -14,9 +14,9 @@ public class LcdConfig : IDisposable
     protected int BL_PIN;
     protected int BL_freq;
 
-    public LcdConfig(SpiDevice spi, SoftwarePwmChannel pwmBacklight, int spiFreq = 40000000, int rst = 27, int dc = 25, int bl = 18, int blFreq = 1000)
+    public LcdConfig(SpiDevice spi, SoftwarePwmChannel pwmBacklight, GpioController gpio, int spiFreq = 40000000, int rst = 27, int dc = 25, int bl = 18, int blFreq = 1000)
     {
-        _gpio = new GpioController();
+        _gpio = gpio;
         this._spi = spi;
         this.RST_PIN = rst;
         this.DC_PIN = dc;

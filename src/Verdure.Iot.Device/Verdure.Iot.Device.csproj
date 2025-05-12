@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	<VersionPrefix>1.0.4</VersionPrefix>
+	<VersionPrefix>1.0.5</VersionPrefix>
 	<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 	<Authors>绿荫阿广</Authors>
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -17,6 +17,6 @@
 		<PackageReference Include="System.Device.Gpio" Version="3.2.0" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.6" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
 	</ItemGroup>
 </Project>

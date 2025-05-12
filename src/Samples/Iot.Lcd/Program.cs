@@ -1,11 +1,15 @@
 ﻿using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
+using System.Device.Gpio;
 using System.Device.Pwm.Drivers;
 using System.Device.Spi;
 using Verdure.Iot.Device;
 
-using var pwmBacklight = new SoftwarePwmChannel(pinNumber: 18, frequency: 1000);
+var gpio = new GpioController();
+
+using var pwmBacklight = new SoftwarePwmChannel(pinNumber: 18, frequency: 1000, controller: gpio);
+
 pwmBacklight.Start();
 
 
@@ -24,14 +28,14 @@ using SpiDevice sender1inch47Device = SpiDevice.Create(new SpiConnectionSettings
     Mode = SpiMode.Mode0
 });
 
-using var inch24 = new LCD2inch4(sender2inch4Device, pwmBacklight);
+using var inch24 = new LCD2inch4(sender2inch4Device, pwmBacklight, gpio);
 inch24.Reset();
 inch24.Init();
 inch24.SetWindows(0, 0, LCD2inch4.Width, LCD2inch4.Height);
 inch24.Clear();
 inch24.BlDutyCycle(50);
 
-using var inch147 = new LCD1inch47(sender1inch47Device, pwmBacklight);
+using var inch147 = new LCD1inch47(sender1inch47Device, pwmBacklight, gpio);
 
 //inch147.Reset();
 inch147.Init();

@@ -105,57 +105,59 @@ public class ST7789Display : IDisposable
         SendCommand(0x11);    // Sleep Out
         Thread.Sleep(120);
 
-        SendCommand(0x36);    // MADCTL: Memory Data Access Control
-        SendData(0x00);       // 根据LCD2inch4类设置为0x00
+        SendCommand(0x36);        // MADCTL: Memory Data Access Control
+        SendData(0x00);           // 根据LCD2inch4类设置为0x00
 
-        SendCommand(0x3A);    // COLMOD: Pixel Format Set
-        SendData(0x05);       // 16-bit/pixel (5-6-5 RGB)
+        SendCommand(0x3A);        // COLMOD: Pixel Format Set
+        SendData(0x05);           // 16-bit/pixel (5-6-5 RGB)
 
-        SendCommand(0x2A);    // Column Address Set
+        SendCommand(0x21);        // Display Inversion On
+
+        SendCommand(0x2A);        // Column Address Set
         SendData(0x00);
         SendData(0x00);
         SendData(0x01);
-        SendData(0x3F);      // 320-1
+        SendData(0x3F);          // 320-1
 
-        SendCommand(0x2B);    // Row Address Set
+        SendCommand(0x2B);        // Row Address Set
         SendData(0x00);
         SendData(0x00);
         SendData(0x00);
-        SendData(0xEF);      // 240-1
+        SendData(0xEF);          // 240-1
 
-        SendCommand(0xB2);    // Porch Setting
+        SendCommand(0xB2);        // Porch Setting
         SendData(0x0C);
         SendData(0x0C);
         SendData(0x00);
         SendData(0x33);
         SendData(0x33);
 
-        SendCommand(0xB7);    // Gate Control
+        SendCommand(0xB7);        // Gate Control
         SendData(0x35);
 
-        SendCommand(0xBB);    // VCOM Setting
+        SendCommand(0xBB);        // VCOM Setting
         SendData(0x1F);
 
-        SendCommand(0xC0);    // LCM Control
+        SendCommand(0xC0);        // LCM Control
         SendData(0x2C);
 
-        SendCommand(0xC2);    // VDV and VRH Command Enable
+        SendCommand(0xC2);        // VDV and VRH Command Enable
         SendData(0x01);
 
-        SendCommand(0xC3);    // VRH Set
+        SendCommand(0xC3);        // VRH Set
         SendData(0x12);
 
-        SendCommand(0xC4);    // VDV Set
+        SendCommand(0xC4);        // VDV Set
         SendData(0x20);
 
-        SendCommand(0xC6);    // Frame Rate Control
+        Command(0xC6);        // Frame Rate Control
         SendData(0x0F);
 
-        SendCommand(0xD0);    // Power Control 1
+        SendCommand(0xD0);        // Power Control 1
         SendData(0xA4);
         SendData(0xA1);
 
-        SendCommand(0xE0);    // Positive Voltage Gamma Control
+        SendCommand(0xE0);        // Positive Voltage Gamma Control
         SendData(0xD0);
         SendData(0x08);
         SendData(0x11);
@@ -171,7 +173,7 @@ public class ST7789Display : IDisposable
         SendData(0x29);
         SendData(0x2D);
 
-        SendCommand(0xE1);    // Negative Voltage Gamma Control
+        SendCommand(0xE1);        // Negative Voltage Gamma Control
         SendData(0xD0);
         SendData(0x08);
         SendData(0x10);
@@ -187,12 +189,11 @@ public class ST7789Display : IDisposable
         SendData(0x2F);
         SendData(0x31);
 
-        SendCommand(0x21);    // Display Inversion On
-
         // 修正显示区域设置
         SetAddressWindow(0, 0, _width, _height);
 
-        SendCommand(0x29);    // Display On
+        SendCommand(0x29);        // Display On
+
         Thread.Sleep(20);
     }
 
@@ -283,6 +284,7 @@ public class ST7789Display : IDisposable
         SetAddressWindow(0, 0, _width, _height);
 
         SendCommand(0x29);    // Display On
+
         Thread.Sleep(20);
     }
 
@@ -540,33 +542,6 @@ public class ST7789Display : IDisposable
         // 写入RAM命令
         SendCommand(0x2C);
     }
-
-    // 设置显示区域
-    //public void SetAddressWindow(int x0, int y0, int x1, int y1)
-    //{
-    //    x0 += _xOffset;
-    //    y0 += _yOffset;
-    //    x1 += _xOffset;
-    //    y1 += _yOffset;
-
-    //    // 列地址设置
-    //    SendCommand(0x2A);
-    //    SendData((byte)(x0 >> 8));
-    //    SendData((byte)x0);
-    //    SendData((byte)(x1 >> 8));
-    //    SendData((byte)x1);
-
-    //    // 行地址设置
-    //    SendCommand(0x2B);
-    //    SendData((byte)(y0 >> 8));
-    //    SendData((byte)y0);
-    //    SendData((byte)(y1 >> 8));
-    //    SendData((byte)y1);
-
-    //    // 写入RAM
-    //    SendCommand(0x2C);
-    //}
-
     // 显示图像
     public void DrawImage(byte[] imageData)
     {

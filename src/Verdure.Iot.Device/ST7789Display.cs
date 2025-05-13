@@ -20,6 +20,22 @@ public class ST7789Display : IDisposable
     private readonly DisplayType _displayType;
     private const int MAX_TRANSFER_SIZE = 4096; // 最大一次传输字节数
 
+    /// <summary>
+    /// 复位事件参数类
+    /// </summary>
+    public class ResetEventArgs : EventArgs
+    {
+        /// <summary>
+        /// 指示复位是否已被处理
+        /// </summary>
+        public bool Handled { get; set; }
+    }
+
+    /// <summary>
+    /// 当显示屏需要硬件复位时触发
+    /// </summary>
+    public event EventHandler<ResetEventArgs>? ResetRequired;
+
     // 构造函数支持不同尺寸屏幕的配置参数
     public ST7789Display(SpiConnectionSettings settings, GpioController gpio, int dcPin, int resetPin, int csPin = -1, DisplayType displayType = DisplayType.Display24Inch)
     {
@@ -102,32 +118,30 @@ public class ST7789Display : IDisposable
         SendCommand(0x01);    // Software Reset
         Thread.Sleep(150);
 
-        SendCommand(0x11);    // Sleep Out
-        Thread.Sleep(120);
-
-        // MADCTL: Memory Data Access Control - 修正方向和色彩设置
+        // MADCTL: Memory Data Access Control
         SendCommand(0x36);
-        SendData(0x70);    // 修改为0x70，确保RGB顺序正确
+        SendData(0x00);    // 按照参考代码修改为0x00
 
         // COLMOD: Pixel Format Set
         SendCommand(0x3A);
         SendData(0x05);    // 16-bit/pixel (5-6-5 RGB)
 
-        // 修正显示区域设置
+        // Display Inversion On
+        SendCommand(0x21);
+
+        // 设置列地址 - 调整为参考代码的顺序
         SendCommand(0x2A);    // Column Address Set
         SendData(0x00);    // 起始列高字节
         SendData(0x00);    // 起始列低字节
-        SendData(0x00);    // 结束列高字节
-        SendData(0xEF);    // 结束列低字节 (239)
+        SendData(0x01);    // 结束列高字节 - 调整为参考代码值
+        SendData(0x3F);    // 结束列低字节 (319)
 
+        // 设置行地址 - 调整为参考代码的顺序
         SendCommand(0x2B);    // Row Address Set
         SendData(0x00);    // 起始行高字节
         SendData(0x00);    // 起始行低字节
-        SendData(0x01);    // 结束行高字节
-        SendData(0x3F);    // 结束行低字节 (319)
-
-        // Display Inversion On
-        SendCommand(0x21);
+        SendData(0x00);    // 结束行高字节 - 调整为参考代码值
+        SendData(0xEF);    // 结束行低字节 (239)
 
         // 电源相关设置
         SendCommand(0xB2);    // Porch Setting
@@ -195,7 +209,11 @@ public class ST7789Display : IDisposable
         SendData(0x2F);
         SendData(0x31);
 
-        // 使用修正后的显示区域设置
+        // Sleep Out
+        SendCommand(0x11);
+        Thread.Sleep(120);
+
+        // 设置显示区域 - 保持现有代码中的调用
         SetAddressWindow(0, 0, _width, _height);
 
         // Display On
@@ -383,8 +401,37 @@ public class ST7789Display : IDisposable
         Thread.Sleep(20);
     }
 
-    // 硬件复位 - 增加复位时间
+    /// <summary>
+    /// 硬件复位 - 通过事件机制允许外部处理或使用默认行为
+    /// </summary>
     public void HardReset()
+    {
+        // 创建事件参数
+        var args = new ResetEventArgs();
+
+        // 触发事件，允许外部处理
+        OnResetRequired(args);
+
+        // 如果外部没有处理，则执行默认的复位逻辑
+        if (!args.Handled)
+        {
+            PerformDefaultReset();
+        }
+    }
+
+    /// <summary>
+    /// 触发复位事件
+    /// </summary>
+    /// <param name="e">复位事件参数</param>
+    protected virtual void OnResetRequired(ResetEventArgs e)
+    {
+        ResetRequired?.Invoke(this, e);
+    }
+
+    /// <summary>
+    /// 执行默认的复位逻辑
+    /// </summary>
+    public void PerformDefaultReset()
     {
         _gpio.Write(_resetPin, PinValue.High);
         Thread.Sleep(20);
@@ -483,18 +530,20 @@ public class ST7789Display : IDisposable
         switch (_displayType)
         {
             case DisplayType.Display24Inch:
-                // 2.4寸屏幕设置 - 修正坐标计算
+                // 2.4寸屏幕设置
                 SendCommand(0x2A);
                 SendData((byte)(x0 >> 8));
                 SendData((byte)(x0 & 0xff));
-                SendData((byte)((x1 - 1) >> 8));
+                SendData((byte)(x1 >> 8));
                 SendData((byte)((x1 - 1) & 0xff));
 
                 SendCommand(0x2B);
                 SendData((byte)(y0 >> 8));
                 SendData((byte)(y0 & 0xff));
-                SendData((byte)((y1 - 1) >> 8));
+                SendData((byte)(y1 >> 8));
                 SendData((byte)((y1 - 1) & 0xff));
+
+                SendCommand(0x2C);
                 break;
 
             case DisplayType.Display147Inch:

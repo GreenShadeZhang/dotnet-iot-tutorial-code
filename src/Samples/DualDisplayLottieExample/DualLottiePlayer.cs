@@ -65,13 +65,13 @@ public class DualLottiePlayer
                         await Task.Run(() =>
                         {
                             // 完全更新第一个屏幕
-                            _display1.SetAddressWindow(0, 0, _display1Width - 1, _display1Height - 1);
+                            //_display1.SetAddressWindow(0, 0, _display1Width - 1, _display1Height - 1);
                             _display1.SendData(frameData1);
                             // 添加少量延时确保CS信号稳定
                             Thread.Sleep(2);
 
                             // 完全更新第二个屏幕
-                            _display2.SetAddressWindow(0, 0, _display2Width - 1, _display2Height - 1);
+                            //_display2.SetAddressWindow(0, 0, _display2Width - 1, _display2Height - 1);
                             _display2.SendData(frameData2);
                             Thread.Sleep(2);
                         });

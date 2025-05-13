@@ -5,30 +5,28 @@ using System.Device.Spi;
 using System.Runtime.InteropServices;
 using Verdure.Iot.Device;
 
-var gpio = new GpioController();
+using var gpio = new GpioController();
 
 var settings1 = new SpiConnectionSettings(0, 0)
 {
-    ClockFrequency = 20_000_000,  // 稍低的SPI频率以减少闪烁
+    ClockFrequency = 24_000_000,  // 稍低的SPI频率以减少闪烁
     Mode = SpiMode.Mode0,
-    DataBitLength = 8
 };
 
 var settings2 = new SpiConnectionSettings(0, 1)
 {
-    ClockFrequency = 20_000_000,
+    ClockFrequency = 24_000_000,
     Mode = SpiMode.Mode0,
-    DataBitLength = 8
 };
 
 try
 {
     DualLottiePlayer? player = null;
+
     if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-    {
-        // 创建两个显示对象
-        using var display1 = new ST7789Display(settings1, gpio, dcPin: 25, resetPin: 27, displayType: DisplayType.Display24Inch);
-        using var display2 = new ST7789Display(settings2, gpio, dcPin: 25, resetPin: 27, displayType: DisplayType.Display147Inch);
+    {        // 创建两个显示对象
+        var display1 = new ST7789Display(settings1, gpio, true, dcPin: 25, resetPin: 27, displayType: DisplayType.Display24Inch);
+        var display2 = new ST7789Display(settings2, gpio, false, dcPin: 25, resetPin: 27, displayType: DisplayType.Display147Inch);
 
         // 清屏以准备播放动画
         display1.FillScreen(0x0000);  // 黑色
@@ -36,9 +34,9 @@ try
 
         // 创建动画播放器
         player = new DualLottiePlayer(
-            display1, 320, 240,  // 2.4寸屏幕
+            display1, 240, 320,  // 2.4寸屏幕
             display2, 172, 320,  // 1.47寸屏幕
-            "ask.json"
+            "LottieLogo.json"
         );
     }
     else

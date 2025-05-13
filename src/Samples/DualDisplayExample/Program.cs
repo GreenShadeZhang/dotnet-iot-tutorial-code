@@ -18,25 +18,9 @@ var settings2 = new SpiConnectionSettings(0, 1)
 };
 
 // 创建显示屏对象
-using var display1 = new ST7789Display(settings1, gpio, dcPin: 25, resetPin: 27, displayType: DisplayType.Display24Inch);
+using var display1 = new ST7789Display(settings1, gpio, true, dcPin: 25, resetPin: 27, displayType: DisplayType.Display24Inch);
 
-display1.ResetRequired += Display1_ResetRequired;
-
-void Display1_ResetRequired(object? sender, ST7789Display.ResetEventArgs e)
-{
-    display1.PerformDefaultReset();
-    e.Handled = true; // 标记事件已处理
-}
-
-using var display2 = new ST7789Display(settings2, gpio, dcPin: 25, resetPin: 27, displayType: DisplayType.Display147Inch);
-
-display2.ResetRequired += Display2_ResetRequired;
-
-void Display2_ResetRequired(object? sender, ST7789Display.ResetEventArgs e)
-{
-    //display2.PerformDefaultReset();
-    e.Handled = true; // 标记事件已处理
-}
+using var display2 = new ST7789Display(settings2, gpio, false, dcPin: 25, resetPin: 27, displayType: DisplayType.Display147Inch);
 
 try
 {
@@ -50,7 +34,7 @@ try
         //Thread.Sleep(1000);
 
         // 然后绘制第二个屏幕
-        //display2.FillScreen(0x07E0);  // 绿色
+        display2.FillScreen(0x07E0);  // 绿色
         Thread.Sleep(10);
 
         Thread.Sleep(1000);
@@ -60,7 +44,7 @@ try
 
         //Thread.Sleep(1000);
 
-        //display2.FillScreen(0xFFE0);  // 黄色
+        display2.FillScreen(0xFFE0);  // 黄色
         Thread.Sleep(10);
 
         Thread.Sleep(1000);

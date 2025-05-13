@@ -20,24 +20,8 @@ public class ST7789Display : IDisposable
     private readonly DisplayType _displayType;
     private const int MAX_TRANSFER_SIZE = 4096; // 最大一次传输字节数
 
-    /// <summary>
-    /// 复位事件参数类
-    /// </summary>
-    public class ResetEventArgs : EventArgs
-    {
-        /// <summary>
-        /// 指示复位是否已被处理
-        /// </summary>
-        public bool Handled { get; set; }
-    }
-
-    /// <summary>
-    /// 当显示屏需要硬件复位时触发
-    /// </summary>
-    public event EventHandler<ResetEventArgs>? ResetRequired;
-
     // 构造函数支持不同尺寸屏幕的配置参数
-    public ST7789Display(SpiConnectionSettings settings, GpioController gpio, int dcPin, int resetPin, int csPin = -1, DisplayType displayType = DisplayType.Display24Inch)
+    public ST7789Display(SpiConnectionSettings settings, GpioController gpio, bool isResetGpio, int dcPin, int resetPin, int csPin = -1, DisplayType displayType = DisplayType.Display24Inch)
     {
         _spiDevice = SpiDevice.Create(settings);
         _gpio = gpio;
@@ -46,9 +30,21 @@ public class ST7789Display : IDisposable
         _csPin = csPin;
         _displayType = displayType;
 
-        // 初始化GPIO引脚
-        _gpio.OpenPin(_dcPin, PinMode.Output);
-        _gpio.OpenPin(_resetPin, PinMode.Output);
+        if (isResetGpio)
+        {
+            // 初始化GPIO引脚
+            gpio.OpenPin(_dcPin, PinMode.Output);
+            gpio.OpenPin(_resetPin, PinMode.Output);
+
+            gpio.Write(_resetPin, PinValue.High);
+            Thread.Sleep(20);
+            gpio.Write(_resetPin, PinValue.Low);
+            Thread.Sleep(20);  // 增加复位低电平时间
+            gpio.Write(_resetPin, PinValue.High);
+            Thread.Sleep(150); // 增加复位后等待时间
+        }
+
+
         if (_csPin >= 0)
         {
             _gpio.OpenPin(_csPin, PinMode.Output);
@@ -93,7 +89,7 @@ public class ST7789Display : IDisposable
     private void Initialize()
     {
         // 硬件复位
-        HardReset();
+        //HardReset();
 
         switch (_displayType)
         {
@@ -399,33 +395,6 @@ public class ST7789Display : IDisposable
 
         SendCommand(0x29);    // Display On
         Thread.Sleep(20);
-    }
-
-    /// <summary>
-    /// 硬件复位 - 通过事件机制允许外部处理或使用默认行为
-    /// </summary>
-    public void HardReset()
-    {
-        // 创建事件参数
-        var args = new ResetEventArgs();
-
-        // 触发事件，允许外部处理
-        OnResetRequired(args);
-
-        // 如果外部没有处理，则执行默认的复位逻辑
-        if (!args.Handled)
-        {
-            PerformDefaultReset();
-        }
-    }
-
-    /// <summary>
-    /// 触发复位事件
-    /// </summary>
-    /// <param name="e">复位事件参数</param>
-    protected virtual void OnResetRequired(ResetEventArgs e)
-    {
-        ResetRequired?.Invoke(this, e);
     }
 
     /// <summary>

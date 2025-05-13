@@ -105,59 +105,65 @@ public class ST7789Display : IDisposable
         SendCommand(0x11);    // Sleep Out
         Thread.Sleep(120);
 
-        SendCommand(0x36);        // MADCTL: Memory Data Access Control
-        SendData(0x00);           // 根据LCD2inch4类设置为0x00
+        // MADCTL: Memory Data Access Control - 修正方向和色彩设置
+        SendCommand(0x36);
+        SendData(0x70);    // 修改为0x70，确保RGB顺序正确
 
-        SendCommand(0x3A);        // COLMOD: Pixel Format Set
-        SendData(0x05);           // 16-bit/pixel (5-6-5 RGB)
+        // COLMOD: Pixel Format Set
+        SendCommand(0x3A);
+        SendData(0x05);    // 16-bit/pixel (5-6-5 RGB)
 
-        SendCommand(0x21);        // Display Inversion On
+        // 修正显示区域设置
+        SendCommand(0x2A);    // Column Address Set
+        SendData(0x00);    // 起始列高字节
+        SendData(0x00);    // 起始列低字节
+        SendData(0x00);    // 结束列高字节
+        SendData(0xEF);    // 结束列低字节 (239)
 
-        SendCommand(0x2A);        // Column Address Set
-        SendData(0x00);
-        SendData(0x00);
-        SendData(0x01);
-        SendData(0x3F);          // 320-1
+        SendCommand(0x2B);    // Row Address Set
+        SendData(0x00);    // 起始行高字节
+        SendData(0x00);    // 起始行低字节
+        SendData(0x01);    // 结束行高字节
+        SendData(0x3F);    // 结束行低字节 (319)
 
-        SendCommand(0x2B);        // Row Address Set
-        SendData(0x00);
-        SendData(0x00);
-        SendData(0x00);
-        SendData(0xEF);          // 240-1
+        // Display Inversion On
+        SendCommand(0x21);
 
-        SendCommand(0xB2);        // Porch Setting
+        // 电源相关设置
+        SendCommand(0xB2);    // Porch Setting
         SendData(0x0C);
         SendData(0x0C);
         SendData(0x00);
         SendData(0x33);
         SendData(0x33);
 
-        SendCommand(0xB7);        // Gate Control
+        SendCommand(0xB7);    // Gate Control
         SendData(0x35);
 
-        SendCommand(0xBB);        // VCOM Setting
+        SendCommand(0xBB);    // VCOM Setting
         SendData(0x1F);
 
-        SendCommand(0xC0);        // LCM Control
+        SendCommand(0xC0);    // LCM Control
         SendData(0x2C);
 
-        SendCommand(0xC2);        // VDV and VRH Command Enable
+        SendCommand(0xC2);    // VDV and VRH Command Enable
         SendData(0x01);
 
-        SendCommand(0xC3);        // VRH Set
+        SendCommand(0xC3);    // VRH Set
         SendData(0x12);
 
-        SendCommand(0xC4);        // VDV Set
+        SendCommand(0xC4);    // VDV Set
         SendData(0x20);
 
-        SendCommand(0xC6);        // Frame Rate Control
+        SendCommand(0xC6);    // Frame Rate Control
         SendData(0x0F);
 
-        SendCommand(0xD0);        // Power Control 1
+        SendCommand(0xD0);    // Power Control 1
         SendData(0xA4);
         SendData(0xA1);
 
-        SendCommand(0xE0);        // Positive Voltage Gamma Control
+        // Gamma校正
+        SendCommand(0xE0);    // Positive Voltage Gamma Control
         SendData(0xD0);
         SendData(0x08);
         SendData(0x11);
@@ -173,7 +179,7 @@ public class ST7789Display : IDisposable
         SendData(0x29);
         SendData(0x2D);
 
-        SendCommand(0xE1);        // Negative Voltage Gamma Control
+        SendCommand(0xE1);    // Negative Voltage Gamma Control
         SendData(0xD0);
         SendData(0x08);
         SendData(0x10);
@@ -189,12 +195,12 @@ public class ST7789Display : IDisposable
         SendData(0x2F);
         SendData(0x31);
 
-        // 修正显示区域设置
+        // 使用修正后的显示区域设置
         SetAddressWindow(0, 0, _width, _height);
 
-        SendCommand(0x29);        // Display On
-
-        Thread.Sleep(20);
+        // Display On
+        SendCommand(0x29);
+        Thread.Sleep(100); // 增加延时确保显示开启完成
     }
 
     // 初始化1.47英寸屏幕
@@ -377,15 +383,15 @@ public class ST7789Display : IDisposable
         Thread.Sleep(20);
     }
 
-    // 硬件复位
+    // 硬件复位 - 增加复位时间
     public void HardReset()
     {
         _gpio.Write(_resetPin, PinValue.High);
-        Thread.Sleep(10);
+        Thread.Sleep(20);
         _gpio.Write(_resetPin, PinValue.Low);
-        Thread.Sleep(10);
+        Thread.Sleep(20);  // 增加复位低电平时间
         _gpio.Write(_resetPin, PinValue.High);
-        Thread.Sleep(120);
+        Thread.Sleep(150); // 增加复位后等待时间
     }
 
     // 发送命令
@@ -477,17 +483,17 @@ public class ST7789Display : IDisposable
         switch (_displayType)
         {
             case DisplayType.Display24Inch:
-                // 2.4寸屏幕设置
+                // 2.4寸屏幕设置 - 修正坐标计算
                 SendCommand(0x2A);
                 SendData((byte)(x0 >> 8));
                 SendData((byte)(x0 & 0xff));
-                SendData((byte)(x1 >> 8));
+                SendData((byte)((x1 - 1) >> 8));
                 SendData((byte)((x1 - 1) & 0xff));
 
                 SendCommand(0x2B);
                 SendData((byte)(y0 >> 8));
                 SendData((byte)(y0 & 0xff));
-                SendData((byte)(y1 >> 8));
+                SendData((byte)((y1 - 1) >> 8));
                 SendData((byte)((y1 - 1) & 0xff));
                 break;
 
@@ -504,8 +510,6 @@ public class ST7789Display : IDisposable
                 SendData((byte)((y0) & 0xff));
                 SendData((byte)((y1 - 1) >> 8 & 0xff));
                 SendData((byte)((y1 - 1) & 0xff));
-
-                SendCommand(0x2C);
                 break;
 
             case DisplayType.Display13Inch:
@@ -514,13 +518,13 @@ public class ST7789Display : IDisposable
                 SendData((byte)(x0 >> 8));
                 SendData((byte)(x0 & 0xff));
                 SendData((byte)(x1 >> 8));
-                SendData((byte)(x1 & 0xff));  // 不需要减1
+                SendData((byte)(x1 & 0xff));
 
                 SendCommand(0x2B);
                 SendData((byte)(y0 >> 8));
                 SendData((byte)(y0 & 0xff));
                 SendData((byte)(y1 >> 8));
-                SendData((byte)(y1 & 0xff));  // 不需要减1
+                SendData((byte)(y1 & 0xff));
                 break;
 
             default:
@@ -614,23 +618,48 @@ public class ST7789Display : IDisposable
         }
     }
 
-    // 设置内存访问控制
+    // 设置内存访问控制 - 修正2.4寸屏幕旋转值
     public void SetRotation(byte rotation)
     {
         SendCommand(0x36);
-        switch (rotation % 4)
+        switch (_displayType)
         {
-            case 0:
-                SendData(_isRgbPanel ? (byte)0x70 : (byte)0x00); // 0度旋转
+            case DisplayType.Display24Inch:
+                // 特别调整2.4寸屏幕的旋转参数
+                switch (rotation % 4)
+                {
+                    case 0:
+                        SendData(0x70); // 0度旋转
+                        break;
+                    case 1:
+                        SendData(0x00); // 90度旋转
+                        break;
+                    case 2:
+                        SendData(0xC0); // 180度旋转
+                        break;
+                    case 3:
+                        SendData(0xA0); // 270度旋转
+                        break;
+                }
                 break;
-            case 1:
-                SendData(_isRgbPanel ? (byte)0x10 : (byte)0x60); // 90度旋转
-                break;
-            case 2:
-                SendData(_isRgbPanel ? (byte)0xB0 : (byte)0xC0); // 180度旋转
-                break;
-            case 3:
-                SendData(_isRgbPanel ? (byte)0xD0 : (byte)0xA0); // 270度旋转
+
+            default:
+                // 其他屏幕使用原来的逻辑
+                switch (rotation % 4)
+                {
+                    case 0:
+                        SendData(_isRgbPanel ? (byte)0x70 : (byte)0x00); // 0度旋转
+                        break;
+                    case 1:
+                        SendData(_isRgbPanel ? (byte)0x10 : (byte)0x60); // 90度旋转
+                        break;
+                    case 2:
+                        SendData(_isRgbPanel ? (byte)0xB0 : (byte)0xC0); // 180度旋转
+                        break;
+                    case 3:
+                        SendData(_isRgbPanel ? (byte)0xD0 : (byte)0xA0); // 270度旋转
+                        break;
+                }
                 break;
         }
     }

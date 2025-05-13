@@ -19,12 +19,12 @@ string input1inch47Path = "verdure901.png";
 
 using SpiDevice sender2inch4Device = SpiDevice.Create(new SpiConnectionSettings(0, 0)
 {
-    ClockFrequency = 50000000,
+    ClockFrequency = 24_000_000,
     Mode = SpiMode.Mode0
 });
 using SpiDevice sender1inch47Device = SpiDevice.Create(new SpiConnectionSettings(0, 1)
 {
-    ClockFrequency = 50000000,
+    ClockFrequency = 24_000_000,
     Mode = SpiMode.Mode0
 });
 
@@ -70,6 +70,7 @@ while (true)
 {
     inch24.ShowImageBytes(data1);
 
+    await Task.Delay(10);
     inch147.ShowImageBytes(data2);
     //using (Image<Bgra32> image2inch41 = Image.Load<Bgra32>(input2inch4Path))
     //{

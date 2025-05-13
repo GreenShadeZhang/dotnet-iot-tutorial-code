@@ -1,26 +1,25 @@
 ﻿// 定义SPI设备设置
+using System.Device.Gpio;
 using System.Device.Spi;
 using Verdure.Iot.Device;
+
+var gpio = new GpioController();
 
 var settings1 = new SpiConnectionSettings(0, 0)
 {
     ClockFrequency = 24_000_000, // 尝试降低SPI时钟频率以减少闪烁
     Mode = SpiMode.Mode0,
-    DataBitLength = 8,
-    ChipSelectLine = 0  // CS1
 };
 
 var settings2 = new SpiConnectionSettings(0, 1)
 {
     ClockFrequency = 24_000_000,
     Mode = SpiMode.Mode0,
-    DataBitLength = 8,
-    ChipSelectLine = 1  // CS2
 };
 
 // 创建显示屏对象
-using (var display1 = new ST7789Display(settings1, dcPin: 25, resetPin: 27, csPin: 8, DisplayType.Display24Inch))
-using (var display2 = new ST7789Display(settings2, dcPin: 25, resetPin: 27, csPin: 7, DisplayType.Display147Inch))
+using (var display1 = new ST7789Display(settings1, gpio, dcPin: 25, resetPin: 27, displayType: DisplayType.Display24Inch))
+using (var display2 = new ST7789Display(settings2, gpio, dcPin: 25, resetPin: 27, displayType: DisplayType.Display147Inch))
 {
     try
     {

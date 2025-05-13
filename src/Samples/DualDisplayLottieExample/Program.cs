@@ -1,8 +1,11 @@
 ﻿// 定义SPI设置
 using DualDisplayLottieExample;
+using System.Device.Gpio;
 using System.Device.Spi;
 using System.Runtime.InteropServices;
 using Verdure.Iot.Device;
+
+var gpio = new GpioController();
 
 var settings1 = new SpiConnectionSettings(0, 0)
 {
@@ -24,8 +27,8 @@ try
     if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
     {
         // 创建两个显示对象
-        using var display1 = new ST7789Display(settings1, dcPin: 25, resetPin: 27, csPin: 8, DisplayType.Display24Inch);
-        using var display2 = new ST7789Display(settings2, dcPin: 25, resetPin: 27, csPin: 7, DisplayType.Display147Inch);
+        using var display1 = new ST7789Display(settings1, gpio, dcPin: 25, resetPin: 27, displayType: DisplayType.Display24Inch);
+        using var display2 = new ST7789Display(settings2, gpio, dcPin: 25, resetPin: 27, displayType: DisplayType.Display147Inch);
 
         // 清屏以准备播放动画
         display1.FillScreen(0x0000);  // 黑色

@@ -47,7 +47,7 @@ try
         player = new DualLottiePlayer(
             null, 320, 240,  // 2.4寸屏幕
             null, 172, 320,  // 1.47寸屏幕
-            "file-plus.json"
+            "ask.json"
         );
     }
 

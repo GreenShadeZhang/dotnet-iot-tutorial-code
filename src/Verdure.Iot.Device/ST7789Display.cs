@@ -43,8 +43,8 @@ public class ST7789Display : IDisposable
         switch (displayType)
         {
             case DisplayType.Display24Inch:
-                _width = 320;
-                _height = 240;
+                _width = 240;
+                _height = 320;
                 _xOffset = 0;
                 _yOffset = 0;
                 _isRgbPanel = true;
@@ -53,7 +53,7 @@ public class ST7789Display : IDisposable
             case DisplayType.Display147Inch:
                 _width = 172;
                 _height = 320;
-                _xOffset = 34;
+                _xOffset = 0;
                 _yOffset = 0;
                 _isRgbPanel = true;
                 break;
@@ -105,15 +105,92 @@ public class ST7789Display : IDisposable
         SendCommand(0x11);    // Sleep Out
         Thread.Sleep(120);
 
-        SendCommand(0x3A);    // COLMOD: Pixel Format Set
-        SendData(0x55);       // 16-bit/pixel
-
-        // 内存访问控制
         SendCommand(0x36);    // MADCTL: Memory Data Access Control
-        SendData(0x70);       // RGB顺序，行地址顺序变更
+        SendData(0x00);       // 根据LCD2inch4类设置为0x00
 
-        // 设置显示区域
-        SetAddressWindow(0, 0, _width - 1, _height - 1);
+        SendCommand(0x3A);    // COLMOD: Pixel Format Set
+        SendData(0x05);       // 16-bit/pixel (5-6-5 RGB)
+
+        SendCommand(0x2A);    // Column Address Set
+        SendData(0x00);
+        SendData(0x00);
+        SendData(0x01);
+        SendData(0x3F);      // 320-1
+
+        SendCommand(0x2B);    // Row Address Set
+        SendData(0x00);
+        SendData(0x00);
+        SendData(0x00);
+        SendData(0xEF);      // 240-1
+
+        SendCommand(0xB2);    // Porch Setting
+        SendData(0x0C);
+        SendData(0x0C);
+        SendData(0x00);
+        SendData(0x33);
+        SendData(0x33);
+
+        SendCommand(0xB7);    // Gate Control
+        SendData(0x35);
+
+        SendCommand(0xBB);    // VCOM Setting
+        SendData(0x1F);
+
+        SendCommand(0xC0);    // LCM Control
+        SendData(0x2C);
+
+        SendCommand(0xC2);    // VDV and VRH Command Enable
+        SendData(0x01);
+
+        SendCommand(0xC3);    // VRH Set
+        SendData(0x12);
+
+        SendCommand(0xC4);    // VDV Set
+        SendData(0x20);
+
+        SendCommand(0xC6);    // Frame Rate Control
+        SendData(0x0F);
+
+        SendCommand(0xD0);    // Power Control 1
+        SendData(0xA4);
+        SendData(0xA1);
+
+        SendCommand(0xE0);    // Positive Voltage Gamma Control
+        SendData(0xD0);
+        SendData(0x08);
+        SendData(0x11);
+        SendData(0x08);
+        SendData(0x0C);
+        SendData(0x15);
+        SendData(0x39);
+        SendData(0x33);
+        SendData(0x50);
+        SendData(0x36);
+        SendData(0x13);
+        SendData(0x14);
+        SendData(0x29);
+        SendData(0x2D);
+
+        SendCommand(0xE1);    // Negative Voltage Gamma Control
+        SendData(0xD0);
+        SendData(0x08);
+        SendData(0x10);
+        SendData(0x08);
+        SendData(0x06);
+        SendData(0x06);
+        SendData(0x39);
+        SendData(0x44);
+        SendData(0x51);
+        SendData(0x0B);
+        SendData(0x16);
+        SendData(0x14);
+        SendData(0x2F);
+        SendData(0x31);
+
+        SendCommand(0x21);    // Display Inversion On
+
+        // 修正显示区域设置
+        SetAddressWindow(0, 0, _width, _height);
 
         SendCommand(0x29);    // Display On
         Thread.Sleep(20);
@@ -203,7 +280,7 @@ public class ST7789Display : IDisposable
         SendCommand(0x21);    // Display Inversion On
 
         // 设置显示区域
-        SetAddressWindow(0, 0, _width - 1, _height - 1);
+        SetAddressWindow(0, 0, _width, _height);
 
         SendCommand(0x29);    // Display On
         Thread.Sleep(20);
@@ -290,7 +367,7 @@ public class ST7789Display : IDisposable
         SendData(0x23);
 
         // 设置显示区域
-        SetAddressWindow(0, 0, _width - 1, _height - 1);
+        SetAddressWindow(0, 0, _width, _height);
 
         SendCommand(0x21);    // Display Inversion On
 
@@ -388,28 +465,107 @@ public class ST7789Display : IDisposable
     // 设置显示区域
     public void SetAddressWindow(int x0, int y0, int x1, int y1)
     {
+        // 应用偏移量
         x0 += _xOffset;
         y0 += _yOffset;
         x1 += _xOffset;
         y1 += _yOffset;
 
-        // 列地址设置
-        SendCommand(0x2A);
-        SendData((byte)(x0 >> 8));
-        SendData((byte)x0);
-        SendData((byte)(x1 >> 8));
-        SendData((byte)x1);
+        // 根据屏幕类型调整显示区域设置
+        switch (_displayType)
+        {
+            case DisplayType.Display24Inch:
+                // 2.4寸屏幕设置
+                SendCommand(0x2A);
+                SendData((byte)(x0 >> 8));
+                SendData((byte)(x0 & 0xff));
+                SendData((byte)(x1 >> 8));
+                SendData((byte)((x1 - 1) & 0xff));
 
-        // 行地址设置
-        SendCommand(0x2B);
-        SendData((byte)(y0 >> 8));
-        SendData((byte)y0);
-        SendData((byte)(y1 >> 8));
-        SendData((byte)y1);
+                SendCommand(0x2B);
+                SendData((byte)(y0 >> 8));
+                SendData((byte)(y0 & 0xff));
+                SendData((byte)(y1 >> 8));
+                SendData((byte)((y1 - 1) & 0xff));
+                break;
 
-        // 写入RAM
+            case DisplayType.Display147Inch:
+                // 1.47寸屏幕设置
+                Command(0x2A);
+                Data((byte)(((x0) >> 8) & 0xff));
+                Data((byte)((x0 + 34) & 0xff));
+                Data((byte)((x1 - 1 + 34) >> 8 & 0xff));
+                Data((byte)((x1 - 1 + 34) & 0xff));
+
+                Command(0x2B);
+                Data((byte)((y0) >> 8 & 0xff));
+                Data((byte)((y0) & 0xff));
+                Data((byte)((y1 - 1) >> 8 & 0xff));
+                Data((byte)((y1 - 1) & 0xff));
+
+                Command(0x2C);
+                break;
+
+            case DisplayType.Display13Inch:
+                // 1.3寸屏幕设置
+                SendCommand(0x2A);
+                SendData((byte)(x0 >> 8));
+                SendData((byte)(x0 & 0xff));
+                SendData((byte)(x1 >> 8));
+                SendData((byte)(x1 & 0xff));  // 不需要减1
+
+                SendCommand(0x2B);
+                SendData((byte)(y0 >> 8));
+                SendData((byte)(y0 & 0xff));
+                SendData((byte)(y1 >> 8));
+                SendData((byte)(y1 & 0xff));  // 不需要减1
+                break;
+
+            default:
+                // 默认设置方式
+                SendCommand(0x2A);
+                SendData((byte)(x0 >> 8));
+                SendData((byte)(x0 & 0xff));
+                SendData((byte)(x1 >> 8));
+                SendData((byte)(x1 & 0xff));
+
+                SendCommand(0x2B);
+                SendData((byte)(y0 >> 8));
+                SendData((byte)(y0 & 0xff));
+                SendData((byte)(y1 >> 8));
+                SendData((byte)(y1 & 0xff));
+                break;
+        }
+
+        // 写入RAM命令
         SendCommand(0x2C);
     }
+
+    // 设置显示区域
+    //public void SetAddressWindow(int x0, int y0, int x1, int y1)
+    //{
+    //    x0 += _xOffset;
+    //    y0 += _yOffset;
+    //    x1 += _xOffset;
+    //    y1 += _yOffset;
+
+    //    // 列地址设置
+    //    SendCommand(0x2A);
+    //    SendData((byte)(x0 >> 8));
+    //    SendData((byte)x0);
+    //    SendData((byte)(x1 >> 8));
+    //    SendData((byte)x1);
+
+    //    // 行地址设置
+    //    SendCommand(0x2B);
+    //    SendData((byte)(y0 >> 8));
+    //    SendData((byte)y0);
+    //    SendData((byte)(y1 >> 8));
+    //    SendData((byte)y1);
+
+    //    // 写入RAM
+    //    SendCommand(0x2C);
+    //}
 
     // 显示图像
     public void DrawImage(byte[] imageData)
@@ -428,7 +584,7 @@ public class ST7789Display : IDisposable
         int displayWidth = Math.Min(_width - xStart, imwidth);
         int displayHeight = Math.Min(_height - yStart, imheight);
 
-        SetAddressWindow(xStart, yStart, xStart + displayWidth - 1, yStart + displayHeight - 1);
+        SetAddressWindow(xStart, yStart, xStart + displayWidth, yStart + displayHeight);
 
         // 将图像转换为设备支持的格式
         var pixelData = GetImageBytes(image);
@@ -458,7 +614,7 @@ public class ST7789Display : IDisposable
     // 填充纯色
     public void FillScreen(ushort color)
     {
-        SetAddressWindow(0, 0, _width - 1, _height - 1);
+        SetAddressWindow(0, 0, _width, _height);
 
         // 创建缓冲区（考虑内存限制，使用较小的缓冲区）
         int bufferSize = Math.Min(_width * _height * 2, 32768); // 最大32KB的缓冲区
@@ -510,6 +666,14 @@ public class ST7789Display : IDisposable
     // 获取屏幕高度
     public int Height => _height;
 
+
+
+    // Command方法作为SendCommand的别名
+    public void Command(byte cmd) => SendCommand(cmd);
+
+    // Data方法作为SendData的别名
+    public void Data(byte data) => SendData(data);
+
     public void Dispose()
     {
         _spiDevice?.Dispose();
@@ -534,3 +698,4 @@ public enum DisplayType
     Display147Inch,
     Display13Inch
 }
+

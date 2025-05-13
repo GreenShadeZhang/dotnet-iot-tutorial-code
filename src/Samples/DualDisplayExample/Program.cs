@@ -18,35 +18,37 @@ var settings2 = new SpiConnectionSettings(0, 1)
 };
 
 // 创建显示屏对象
-using (var display1 = new ST7789Display(settings1, gpio, dcPin: 25, resetPin: 27, displayType: DisplayType.Display24Inch))
-using (var display2 = new ST7789Display(settings2, gpio, dcPin: 25, resetPin: 27, displayType: DisplayType.Display147Inch))
+using var display1 = new ST7789Display(settings1, gpio, dcPin: 25, resetPin: 27, displayType: DisplayType.Display24Inch);
+using var display2 = new ST7789Display(settings2, gpio, dcPin: 25, resetPin: 27, displayType: DisplayType.Display147Inch);
+try
 {
-    try
+    while (true)
     {
-        while (true)
-        {
-            // 首先完成第一个屏幕的绘制
-            display1.FillScreen(0xF800);  // 红色
-                                          // 添加延时确保CS信号稳定
-            Thread.Sleep(10);
+        // 首先完成第一个屏幕的绘制
+        display1.FillScreen(0xF800);  // 红色
+                                      // 添加延时确保CS信号稳定
+        Thread.Sleep(10);
 
-            // 然后绘制第二个屏幕
-            display2.FillScreen(0x07E0);  // 绿色
-            Thread.Sleep(10);
+        Thread.Sleep(1000);
 
-            Thread.Sleep(1000);
+        // 然后绘制第二个屏幕
+        display2.FillScreen(0x07E0);  // 绿色
+        Thread.Sleep(10);
 
-            display1.FillScreen(0x001F);  // 蓝色
-            Thread.Sleep(10);
+        Thread.Sleep(1000);
 
-            display2.FillScreen(0xFFE0);  // 黄色
-            Thread.Sleep(10);
+        display1.FillScreen(0x001F);  // 蓝色
+        Thread.Sleep(10);
 
-            Thread.Sleep(1000);
-        }
+        Thread.Sleep(1000);
+
+        display2.FillScreen(0xFFE0);  // 黄色
+        Thread.Sleep(10);
+
+        Thread.Sleep(1000);
     }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"错误: {ex.Message}");
-    }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"错误: {ex.Message}");
 }

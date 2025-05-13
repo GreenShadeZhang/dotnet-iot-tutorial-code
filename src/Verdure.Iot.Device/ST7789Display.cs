@@ -150,7 +150,7 @@ public class ST7789Display : IDisposable
         SendCommand(0xC4);        // VDV Set
         SendData(0x20);
 
-        Command(0xC6);        // Frame Rate Control
+        SendCommand(0xC6);        // Frame Rate Control
         SendData(0x0F);
 
         SendCommand(0xD0);        // Power Control 1
@@ -493,19 +493,19 @@ public class ST7789Display : IDisposable
 
             case DisplayType.Display147Inch:
                 // 1.47寸屏幕设置
-                Command(0x2A);
-                Data((byte)(((x0) >> 8) & 0xff));
-                Data((byte)((x0 + 34) & 0xff));
-                Data((byte)((x1 - 1 + 34) >> 8 & 0xff));
-                Data((byte)((x1 - 1 + 34) & 0xff));
+                SendCommand(0x2A);
+                SendData((byte)(((x0) >> 8) & 0xff));
+                SendData((byte)((x0 + 34) & 0xff));
+                SendData((byte)((x1 - 1 + 34) >> 8 & 0xff));
+                SendData((byte)((x1 - 1 + 34) & 0xff));
 
-                Command(0x2B);
-                Data((byte)((y0) >> 8 & 0xff));
-                Data((byte)((y0) & 0xff));
-                Data((byte)((y1 - 1) >> 8 & 0xff));
-                Data((byte)((y1 - 1) & 0xff));
+                SendCommand(0x2B);
+                SendData((byte)((y0) >> 8 & 0xff));
+                SendData((byte)((y0) & 0xff));
+                SendData((byte)((y1 - 1) >> 8 & 0xff));
+                SendData((byte)((y1 - 1) & 0xff));
 
-                Command(0x2C);
+                SendCommand(0x2C);
                 break;
 
             case DisplayType.Display13Inch:
@@ -641,13 +641,6 @@ public class ST7789Display : IDisposable
     // 获取屏幕高度
     public int Height => _height;
 
-
-
-    // Command方法作为SendCommand的别名
-    public void Command(byte cmd) => SendCommand(cmd);
-
-    // Data方法作为SendData的别名
-    public void Data(byte data) => SendData(data);
 
     public void Dispose()
     {

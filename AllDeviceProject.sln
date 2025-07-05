@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DualDisplayExample", "src\S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DualDisplayLottieExample", "src\Samples\DualDisplayLottieExample\DualDisplayLottieExample.csproj", "{2C9ECD00-FC72-4ACC-A47A-A33DD4778351}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiServoController", "src\Samples\MultiServoController\MultiServoController.csproj", "{8346F370-1E9E-21D4-9D9C-DE6D4280C5F7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -71,6 +73,10 @@ Global
 		{2C9ECD00-FC72-4ACC-A47A-A33DD4778351}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C9ECD00-FC72-4ACC-A47A-A33DD4778351}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C9ECD00-FC72-4ACC-A47A-A33DD4778351}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8346F370-1E9E-21D4-9D9C-DE6D4280C5F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8346F370-1E9E-21D4-9D9C-DE6D4280C5F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8346F370-1E9E-21D4-9D9C-DE6D4280C5F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8346F370-1E9E-21D4-9D9C-DE6D4280C5F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

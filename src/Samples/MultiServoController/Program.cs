@@ -86,7 +86,13 @@ else
         Console.WriteLine("例如: 2 10 (将头部设置为10度)");
         Console.WriteLine("输入 'exit' 退出程序");
         Console.WriteLine("输入 'action [动作名]' 执行预定义动作");
-        Console.WriteLine("可用动作: 初始化, 点头, 挥手, 旋转");
+        Console.WriteLine("可用动作: 初始化, 点头, 挥手, 旋转, 循环测试, 同步测试, 波浪测试, 头部测试, 手臂测试");
+        Console.WriteLine("新增测试动作说明:");
+        Console.WriteLine("  - 循环测试: 逐个关节进行全范围循环往复运动");
+        Console.WriteLine("  - 同步测试: 所有关节同时进行同步循环运动");
+        Console.WriteLine("  - 波浪测试: 关节依次运动形成波浪效果");
+        Console.WriteLine("  - 头部测试: 单独测试头部关节");
+        Console.WriteLine("  - 手臂测试: 同步测试所有手臂关节");
         Console.WriteLine();
 
         while (true)

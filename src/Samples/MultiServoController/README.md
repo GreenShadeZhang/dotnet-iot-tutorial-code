@@ -50,6 +50,39 @@ robot.PerformAction("初始化");  // 所有关节回到初始位置
 robot.PerformAction("点头");    // 执行点头动作
 robot.PerformAction("挥手");    // 执行挥手动作
 robot.PerformAction("旋转");    // 执行底部旋转动作
+
+// 新增循环往复测试动作
+robot.PerformAction("循环测试");  // 逐个关节进行全范围循环往复运动
+robot.PerformAction("同步测试");  // 所有关节同时进行同步循环运动
+robot.PerformAction("波浪测试");  // 关节依次运动形成波浪效果
+robot.PerformAction("头部测试");  // 单独测试头部关节
+robot.PerformAction("手臂测试");  // 同步测试所有手臂关节
+```
+
+### 3. 循环往复测试功能
+
+#### 单关节循环测试
+```csharp
+// 测试指定关节，3个循环，每步100ms延时
+robot.PerformJointCycleTest(2, 3, 100);
+```
+
+#### 多关节同步循环测试
+```csharp
+// 多个关节同步运动测试
+robot.PerformSynchronizedCycleTest(new int[] { 2, 4, 6 }, 2, 150);
+```
+
+#### 波浪式循环测试
+```csharp
+// 关节依次运动形成波浪效果
+robot.PerformWaveCycleTest(3, 200);
+```
+
+#### 所有关节循环测试
+```csharp
+// 自动测试所有可用关节
+robot.PerformAllJointsCycleTest(2, 100);
 ```
 
 ### 3. 交互式控制
@@ -57,10 +90,43 @@ robot.PerformAction("旋转");    // 执行底部旋转动作
 运行程序后，可以通过命令行进行实时控制：
 
 ```
-请输入命令: 2 10          # 将头部设置为10度
-请输入命令: action 挥手    # 执行挥手动作
-请输入命令: exit          # 退出程序
+请输入命令: 2 10              # 将头部设置为10度
+请输入命令: action 挥手        # 执行挥手动作
+请输入命令: action 循环测试    # 执行所有关节循环测试
+请输入命令: action 同步测试    # 执行多关节同步测试
+请输入命令: action 波浪测试    # 执行波浪式测试
+请输入命令: exit              # 退出程序
 ```
+
+## 测试功能说明
+
+### 循环往复测试类型
+
+1. **单关节循环测试** (`PerformJointCycleTest`)
+   - 测试指定关节在其完整角度范围内的循环往复运动
+   - 可设置循环次数和步进延时
+   - 自动计算合适的步进角度
+
+2. **多关节同步测试** (`PerformSynchronizedCycleTest`)
+   - 多个关节同时进行同步循环运动
+   - 所有关节同时到达各自的最大/最小角度
+   - 适合测试整体协调性
+
+3. **波浪式测试** (`PerformWaveCycleTest`)
+   - 关节依次运动，形成波浪传递效果
+   - 正向和反向波浪交替进行
+   - 适合测试动态效果
+
+4. **全关节循环测试** (`PerformAllJointsCycleTest`)
+   - 自动检测所有可用关节
+   - 逐个进行循环测试
+   - 适合完整的系统测试
+
+### 测试参数说明
+
+- **cycles**: 循环次数，控制测试重复次数
+- **stepDelay**: 步进延时（毫秒），控制运动速度
+- **waveDelay**: 波浪延时（毫秒），控制波浪传递速度
 
 ## 角度映射原理
 

@@ -43,8 +43,8 @@ namespace MultiServoController
             {
                 Id = 4,
                 Name = "左臂展开",
-                ServoAngleMin = -9,     // 参考Bsp配置
-                ServoAngleMax = 3,
+                ServoAngleMin = 30,     // 修正为合理的物理角度范围
+                ServoAngleMax = 90,
                 ModelAngleMin = 0,
                 ModelAngleMax = 30,
                 IsInverted = false,
@@ -55,8 +55,8 @@ namespace MultiServoController
             {
                 Id = 6,
                 Name = "左臂旋转",
-                ServoAngleMin = -16,    // 参考Bsp配置
-                ServoAngleMax = 117,
+                ServoAngleMin = 0,      // 调整为与底座一致的180°物理范围
+                ServoAngleMax = 180,
                 ModelAngleMin = 0,
                 ModelAngleMax = 180,
                 IsInverted = false,
@@ -67,8 +67,8 @@ namespace MultiServoController
             {
                 Id = 8,
                 Name = "右臂展开",
-                ServoAngleMin = 133,    // 参考Bsp配置
-                ServoAngleMax = 141,
+                ServoAngleMin = 120,    // 扩大物理活动范围
+                ServoAngleMax = 180,
                 ModelAngleMin = 0,
                 ModelAngleMax = 30,
                 IsInverted = true,
@@ -79,8 +79,8 @@ namespace MultiServoController
             {
                 Id = 10,
                 Name = "右臂旋转",
-                ServoAngleMin = 15,     // 参考Bsp配置
-                ServoAngleMax = 150,
+                ServoAngleMin = 0,      // 调整为与底座一致的180°物理范围
+                ServoAngleMax = 180,
                 ModelAngleMin = 0,
                 ModelAngleMax = 180,
                 IsInverted = true,

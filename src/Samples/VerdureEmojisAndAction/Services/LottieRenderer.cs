@@ -9,7 +9,7 @@ namespace VerdureEmojisAndAction.Services;
 public class LottieRenderer : IDisposable
 {
     private readonly string _lottieFilePath;
-    private SKData _lottieData;
+    private SKData? _lottieData;
     private Animation? _animation;
     private double _totalFrames;
     private double _totalSeconds;
@@ -123,11 +123,9 @@ public class LottieRenderer : IDisposable
         // 设置动画大小以适应屏幕
         var rect = new SKRect(0, 0, width, height);
 
-        // 在指定时间点渲染帧
-        _animation.SeekFrameTime(timePoint);
-        _animation.Render(canvas, rect);
-
-        // 获取图像
+            // 在指定时间点渲染帧
+            _animation?.SeekFrameTime(timePoint);
+            _animation?.Render(canvas, rect);        // 获取图像
         using var image = surface.Snapshot();
         using var pixmap = image.PeekPixels();
 

@@ -132,8 +132,32 @@ public class LottieRenderer : IDisposable
         using var image = surface.Snapshot();
         using var pixmap = image.PeekPixels();
 
+        // 保存图像到文件（调试用）
+        SaveImageToFile(image);
+
         // 转换为RGB565格式（ST7789V3兼容）
         return ConvertToRgb565(pixmap, width, height);
+    }
+
+    /// <summary>
+    /// 保存图像到当前目录
+    /// </summary>
+    private void SaveImageToFile(SKImage image)
+    {
+        try
+        {
+            var timestamp = DateTime.Now.ToString("yyyyMMdd_HHmmss_fff");
+            var fileName = $"lottie_frame_{timestamp}.png";
+            var filePath = Path.Combine(Directory.GetCurrentDirectory(), fileName);
+
+            using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+            using var stream = File.OpenWrite(filePath);
+            data.SaveTo(stream);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"保存图像失败: {ex.Message}");
+        }
     }
 
     /// <summary>

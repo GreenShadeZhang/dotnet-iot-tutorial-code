@@ -2,8 +2,6 @@ using System.Device.Gpio;
 using System.Device.Spi;
 using Verdure.Iot.Device;
 
-var gpio = new GpioController();
-
 // 1.47寸屏幕设置
 var settings = new SpiConnectionSettings(0, 1)
 {
@@ -21,13 +19,13 @@ try
     Console.WriteLine();
 
     // ============= 竖屏模式测试 =============
-    await TestPortraitMode(settings, gpio);
+    await TestPortraitMode(settings);
     
     Console.WriteLine("\n按任意键开始横屏模式测试...");
     Console.ReadKey();
     
     // ============= 横屏模式测试 =============
-    await TestLandscapeMode(settings, gpio);
+    await TestLandscapeMode(settings);
     
     Console.WriteLine("\n==================================================");
     Console.WriteLine("           测试完成！总结：");
@@ -43,17 +41,14 @@ catch (Exception ex)
     Console.WriteLine($"❌ 错误: {ex.Message}");
     Console.WriteLine($"堆栈跟踪: {ex.StackTrace}");
 }
-finally
-{
-    gpio?.Dispose();
-}
 
 // 竖屏模式测试函数
-static async Task TestPortraitMode(SpiConnectionSettings settings, GpioController gpio)
+static async Task TestPortraitMode(SpiConnectionSettings settings)
 {
     Console.WriteLine("🔄 开始竖屏模式测试...");
     Console.WriteLine("创建竖屏显示 (172x320)");
     
+    using var gpio = new GpioController();
     using var display = new ST7789Display(
         settings, gpio, true, 
         dcPin: 25, resetPin: 27, 
@@ -87,11 +82,12 @@ static async Task TestPortraitMode(SpiConnectionSettings settings, GpioControlle
 }
 
 // 横屏模式测试函数
-static async Task TestLandscapeMode(SpiConnectionSettings settings, GpioController gpio)
+static async Task TestLandscapeMode(SpiConnectionSettings settings)
 {
     Console.WriteLine("🔄 开始横屏模式测试...");
     Console.WriteLine("创建横屏显示 (320x172)");
     
+    using var gpio = new GpioController();
     using var display = new ST7789Display(
         settings, gpio, true, 
         dcPin: 25, resetPin: 27, 

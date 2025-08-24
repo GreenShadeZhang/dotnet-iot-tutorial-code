@@ -76,7 +76,7 @@ public class ST7789Display : IDisposable
                     // 竖屏模式：172x320  
                     _width = 172;
                     _height = 320;
-                    _xOffset = 34;  // 竖屏模式需要X偏移
+                    _xOffset = 0;  // 竖屏模式需要X偏移
                     _yOffset = 0;
                 }
                 _isRgbPanel = true;

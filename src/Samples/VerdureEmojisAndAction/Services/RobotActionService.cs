@@ -218,17 +218,23 @@ public class RobotActionService : IDisposable
     /// <summary>
     /// 执行预定义的动作序列
     /// </summary>
-    public async Task PerformActionAsync(EmotionType emotionType, CancellationToken cancellationToken = default)
+    public async Task PerformActionAsync(string emotionType, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation($"执行动作: {emotionType}");
 
+        if (!EmotionTypes.IsValid(emotionType))
+        {
+            _logger.LogWarning($"无效的动作类型: {emotionType}");
+            return;
+        }
+
         switch (emotionType)
         {
-            case EmotionType.Anger:
+            case EmotionTypes.Anger:
                 await PerformAngerActionAsync(cancellationToken);
                 break;
 
-            case EmotionType.Happy:
+            case EmotionTypes.Happy:
                 await PerformHappyActionAsync(cancellationToken);
                 break;
 

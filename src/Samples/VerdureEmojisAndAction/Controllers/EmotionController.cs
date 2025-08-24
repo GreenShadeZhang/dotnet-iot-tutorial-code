@@ -48,9 +48,14 @@ public class EmotionController : ControllerBase
         {
             _logger.LogInformation($"收到播放请求: EmotionType={request.EmotionType}, IncludeAction={request.IncludeAction}, IncludeEmotion={request.IncludeEmotion}, Loops={request.Loops}, Fps={request.Fps}");
             
-            if (request.EmotionType == null)
+            if (string.IsNullOrWhiteSpace(request.EmotionType))
             {
                 return BadRequest(new { success = false, message = "表情类型不能为空" });
+            }
+            
+            if (!EmotionTypes.IsValid(request.EmotionType))
+            {
+                return BadRequest(new { success = false, message = $"无效的表情类型: {request.EmotionType}" });
             }
             
             var result = await _emotionActionService.PlayEmotionWithActionAsync(request);
@@ -79,11 +84,21 @@ public class EmotionController : ControllerBase
     /// <param name="fps">帧率</param>
     /// <returns>播放结果</returns>
     [HttpPost("play-emotion/{emotionType}")]
-    public async Task<IActionResult> PlayEmotionOnly(EmotionType emotionType, [FromQuery] int loops = 1, [FromQuery] int fps = 30)
+    public async Task<IActionResult> PlayEmotionOnly(string emotionType, [FromQuery] int loops = 1, [FromQuery] int fps = 30)
     {
         try
         {
             _logger.LogInformation($"收到仅播放表情请求: {emotionType}");
+            
+            if (string.IsNullOrWhiteSpace(emotionType))
+            {
+                return BadRequest(new { success = false, message = "表情类型不能为空" });
+            }
+            
+            if (!EmotionTypes.IsValid(emotionType))
+            {
+                return BadRequest(new { success = false, message = $"无效的表情类型: {emotionType}" });
+            }
             
             var result = await _emotionActionService.PlayEmotionOnlyAsync(emotionType, loops, fps);
             
@@ -109,11 +124,21 @@ public class EmotionController : ControllerBase
     /// <param name="emotionType">情感类型</param>
     /// <returns>播放结果</returns>
     [HttpPost("play-action/{emotionType}")]
-    public async Task<IActionResult> PlayActionOnly(EmotionType emotionType)
+    public async Task<IActionResult> PlayActionOnly(string emotionType)
     {
         try
         {
             _logger.LogInformation($"收到仅播放动作请求: {emotionType}");
+            
+            if (string.IsNullOrWhiteSpace(emotionType))
+            {
+                return BadRequest(new { success = false, message = "表情类型不能为空" });
+            }
+            
+            if (!EmotionTypes.IsValid(emotionType))
+            {
+                return BadRequest(new { success = false, message = $"无效的表情类型: {emotionType}" });
+            }
             
             var result = await _emotionActionService.PlayActionOnlyAsync(emotionType);
             

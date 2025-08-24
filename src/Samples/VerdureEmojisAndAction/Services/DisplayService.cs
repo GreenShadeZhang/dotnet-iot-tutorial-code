@@ -16,7 +16,7 @@ public class DisplayService : IDisposable
     private ST7789Display? _display147Inch; // 1.47寸屏幕 - 时间
     private GpioController? _gpio;
     private readonly ILogger<DisplayService> _logger;
-    private readonly Dictionary<EmotionType, LottieRenderer> _lottieRenderers;
+    private readonly Dictionary<string, LottieRenderer> _lottieRenderers;
     private bool _disposed = false;
 
     // 屏幕尺寸配置
@@ -28,7 +28,7 @@ public class DisplayService : IDisposable
     public DisplayService(ILogger<DisplayService> logger)
     {
         _logger = logger;
-        _lottieRenderers = new Dictionary<EmotionType, LottieRenderer>();
+        _lottieRenderers = new Dictionary<string, LottieRenderer>();
 
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
@@ -94,13 +94,13 @@ public class DisplayService : IDisposable
 
             if (!string.IsNullOrEmpty(angerFile))
             {
-                _lottieRenderers[EmotionType.Anger] = new LottieRenderer(angerFile);
+                _lottieRenderers[EmotionTypes.Anger] = new LottieRenderer(angerFile);
                 _logger.LogInformation($"加载愤怒表情文件: {angerFile}");
             }
 
             if (!string.IsNullOrEmpty(happyFile))
             {
-                _lottieRenderers[EmotionType.Happy] = new LottieRenderer(happyFile);
+                _lottieRenderers[EmotionTypes.Happy] = new LottieRenderer(happyFile);
                 _logger.LogInformation($"加载快乐表情文件: {happyFile}");
             }
 
@@ -143,8 +143,14 @@ public class DisplayService : IDisposable
     /// <summary>
     /// 在2.4寸屏幕上播放表情动画
     /// </summary>
-    public async Task PlayEmotionAsync(EmotionType emotionType, int loops = 1, int fps = 30, CancellationToken cancellationToken = default)
+    public async Task PlayEmotionAsync(string emotionType, int loops = 1, int fps = 30, CancellationToken cancellationToken = default)
     {
+        if (!EmotionTypes.IsValid(emotionType))
+        {
+            _logger.LogWarning($"无效的表情类型: {emotionType}");
+            return;
+        }
+        
         if (!_lottieRenderers.ContainsKey(emotionType))
         {
             _logger.LogWarning($"未找到表情类型 {emotionType} 的渲染器");
@@ -339,7 +345,7 @@ public class DisplayService : IDisposable
     /// <summary>
     /// 获取可用的表情类型
     /// </summary>
-    public IEnumerable<EmotionType> GetAvailableEmotions()
+    public IEnumerable<string> GetAvailableEmotions()
     {
         return _lottieRenderers.Keys;
     }

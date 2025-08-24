@@ -11,7 +11,7 @@ public class EmotionActionService : IDisposable
     private readonly RobotActionService _robotActionService;
     private readonly ILogger<EmotionActionService> _logger;
     
-    private readonly Dictionary<EmotionType, EmotionConfig> _emotionConfigs;
+    private readonly Dictionary<string, EmotionConfig> _emotionConfigs;
     private readonly Random _random = new();
     
     // 播放状态管理
@@ -35,13 +35,13 @@ public class EmotionActionService : IDisposable
     /// <summary>
     /// 初始化表情配置
     /// </summary>
-    private Dictionary<EmotionType, EmotionConfig> InitializeEmotionConfigs()
+    private Dictionary<string, EmotionConfig> InitializeEmotionConfigs()
     {
-        return new Dictionary<EmotionType, EmotionConfig>
+        return new Dictionary<string, EmotionConfig>
         {
-            [EmotionType.Anger] = new EmotionConfig
+            [EmotionTypes.Anger] = new EmotionConfig
             {
-                Type = EmotionType.Anger,
+                Type = EmotionTypes.Anger,
                 Name = "愤怒",
                 LottieFile = "anger.mp4.lottie.json",
                 Duration = 4000,
@@ -53,9 +53,9 @@ public class EmotionActionService : IDisposable
                     { 10, 135 },  // 右臂前伸
                 }
             },
-            [EmotionType.Happy] = new EmotionConfig
+            [EmotionTypes.Happy] = new EmotionConfig
             {
-                Type = EmotionType.Happy,
+                Type = EmotionTypes.Happy,
                 Name = "快乐",
                 LottieFile = "happy.mp4.lottie.json",
                 Duration = 3500,
@@ -75,7 +75,14 @@ public class EmotionActionService : IDisposable
         // 停止当前播放
         await StopCurrentPlaybackAsync();
 
-        var emotionType = request.EmotionType ?? GetRandomEmotion();
+        var emotionType = !string.IsNullOrWhiteSpace(request.EmotionType) ? request.EmotionType : GetRandomEmotion();
+        
+        // 验证表情类型
+        if (!EmotionTypes.IsValid(emotionType))
+        {
+            _logger.LogError($"无效的表情类型: {emotionType}");
+            return false;
+        }
         
         lock (_stateLock)
         {
@@ -144,9 +151,15 @@ public class EmotionActionService : IDisposable
     /// <summary>
     /// 仅播放表情动画
     /// </summary>
-    public async Task<bool> PlayEmotionOnlyAsync(EmotionType emotionType, int loops = 1, int fps = 30, CancellationToken cancellationToken = default)
+    public async Task<bool> PlayEmotionOnlyAsync(string emotionType, int loops = 1, int fps = 30, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation($"开始播放表情动画: {emotionType}");
+        
+        if (!EmotionTypes.IsValid(emotionType))
+        {
+            _logger.LogError($"无效的表情类型: {emotionType}");
+            return false;
+        }
         
         try
         {
@@ -168,9 +181,15 @@ public class EmotionActionService : IDisposable
     /// <summary>
     /// 仅播放动作
     /// </summary>
-    public async Task<bool> PlayActionOnlyAsync(EmotionType emotionType, CancellationToken cancellationToken = default)
+    public async Task<bool> PlayActionOnlyAsync(string emotionType, CancellationToken cancellationToken = default)
     {
         _logger.LogInformation($"开始播放动作: {emotionType}");
+        
+        if (!EmotionTypes.IsValid(emotionType))
+        {
+            _logger.LogError($"无效的表情类型: {emotionType}");
+            return false;
+        }
         
         try
         {
@@ -257,13 +276,13 @@ public class EmotionActionService : IDisposable
     /// <summary>
     /// 获取随机表情类型
     /// </summary>
-    private EmotionType GetRandomEmotion()
+    private string GetRandomEmotion()
     {
         var availableEmotions = _displayService.GetAvailableEmotions().ToArray();
         if (availableEmotions.Length == 0)
         {
             _logger.LogWarning("没有可用的表情，返回默认表情");
-            return EmotionType.Happy;
+            return EmotionTypes.Happy;
         }
         
         return availableEmotions[_random.Next(availableEmotions.Length)];
@@ -303,19 +322,19 @@ public class EmotionActionService : IDisposable
 
             // 2. 演示单独的表情播放
             _logger.LogInformation("2. 演示单独的表情播放");
-            await PlayEmotionOnlyAsync(EmotionType.Happy, 1, 30);
+            await PlayEmotionOnlyAsync(EmotionTypes.Happy, 1, 30);
             await Task.Delay(1000);
 
             // 3. 演示单独的动作播放
             _logger.LogInformation("3. 演示单独的动作播放");
-            await PlayActionOnlyAsync(EmotionType.Anger);
+            await PlayActionOnlyAsync(EmotionTypes.Anger);
             await Task.Delay(2000);
 
             // 4. 演示表情和动作同步播放
             _logger.LogInformation("4. 演示表情和动作同步播放 - 快乐");
             await PlayEmotionWithActionAsync(new PlayRequest 
             { 
-                EmotionType = EmotionType.Happy, 
+                EmotionType = EmotionTypes.Happy, 
                 IncludeAction = true, 
                 IncludeEmotion = true,
                 Loops = 1,
@@ -326,7 +345,7 @@ public class EmotionActionService : IDisposable
             _logger.LogInformation("5. 演示表情和动作同步播放 - 愤怒");
             await PlayEmotionWithActionAsync(new PlayRequest 
             { 
-                EmotionType = EmotionType.Anger, 
+                EmotionType = EmotionTypes.Anger, 
                 IncludeAction = true, 
                 IncludeEmotion = true,
                 Loops = 1,

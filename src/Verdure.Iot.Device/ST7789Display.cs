@@ -55,8 +55,8 @@ public class ST7789Display : IDisposable
         switch (displayType)
         {
             case DisplayType.Display24Inch:
-                _width = 240;
-                _height = 320;
+                _width = 320;
+                _height = 240;
                 _xOffset = 0;
                 _yOffset = 0;
                 _isRgbPanel = true;
@@ -116,7 +116,7 @@ public class ST7789Display : IDisposable
 
         // MADCTL: Memory Data Access Control
         SendCommand(0x36);
-        SendData(0x00);    // 按照参考代码修改为0x00
+        SendData(0x70);    // 按照参考代码修改为0x00
 
         // COLMOD: Pixel Format Set
         SendCommand(0x3A);

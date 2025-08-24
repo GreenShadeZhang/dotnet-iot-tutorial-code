@@ -34,9 +34,9 @@ try
 
         // 创建动画播放器
         player = new DualLottiePlayer(
-            display1, 240, 320,  // 2.4寸屏幕
+            display1, 320, 240,  // 2.4寸屏幕
             display2, 172, 320,  // 1.47寸屏幕
-            "speak.json"
+            "anger.mp4.lottie.json"
         );
     }
     else

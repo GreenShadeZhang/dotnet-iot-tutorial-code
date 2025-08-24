@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DualDisplayLottieExample", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultiServoController", "src\Samples\MultiServoController\MultiServoController.csproj", "{8346F370-1E9E-21D4-9D9C-DE6D4280C5F7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LandscapeDisplayTest", "src\Samples\LandscapeDisplayTest\LandscapeDisplayTest.csproj", "{5C085581-0054-CE21-85F9-CCC718027357}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +79,10 @@ Global
 		{8346F370-1E9E-21D4-9D9C-DE6D4280C5F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8346F370-1E9E-21D4-9D9C-DE6D4280C5F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8346F370-1E9E-21D4-9D9C-DE6D4280C5F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C085581-0054-CE21-85F9-CCC718027357}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C085581-0054-CE21-85F9-CCC718027357}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C085581-0054-CE21-85F9-CCC718027357}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C085581-0054-CE21-85F9-CCC718027357}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -90,6 +96,7 @@ Global
 		{A0274131-1830-444E-98BE-85D9D6B4C811} = {A5139A99-41C9-4808-A175-7D83D860F646}
 		{8EFC1C7B-40CC-4F82-859B-25F217701CD6} = {A5139A99-41C9-4808-A175-7D83D860F646}
 		{2C9ECD00-FC72-4ACC-A47A-A33DD4778351} = {A5139A99-41C9-4808-A175-7D83D860F646}
+		{5C085581-0054-CE21-85F9-CCC718027357} = {A5139A99-41C9-4808-A175-7D83D860F646}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5B15746B-2C90-40D5-A8AE-AE81B6B7766F}

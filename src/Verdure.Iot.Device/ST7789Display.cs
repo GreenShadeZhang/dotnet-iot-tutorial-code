@@ -21,7 +21,7 @@ public class ST7789Display : IDisposable
     private const int MAX_TRANSFER_SIZE = 4096; // 最大一次传输字节数
 
     // 构造函数支持不同尺寸屏幕的配置参数
-    public ST7789Display(SpiConnectionSettings settings, GpioController gpio, bool isResetGpio, int dcPin, int resetPin, int csPin = -1, DisplayType displayType = DisplayType.Display24Inch)
+    public ST7789Display(SpiConnectionSettings settings, GpioController gpio, bool isResetGpio, int dcPin, int resetPin, int csPin = -1, DisplayType displayType = DisplayType.Display24Inch, bool isLandscape = false)
     {
         _spiDevice = SpiDevice.Create(settings);
         _gpio = gpio;
@@ -63,10 +63,22 @@ public class ST7789Display : IDisposable
                 break;
 
             case DisplayType.Display147Inch:
-                _width = 172;
-                _height = 320;
-                _xOffset = 0;
-                _yOffset = 0;
+                if (isLandscape)
+                {
+                    // 横屏模式：320x172
+                    _width = 320;
+                    _height = 172;
+                    _xOffset = 0;   // 横屏模式不需要偏移
+                    _yOffset = 0;
+                }
+                else
+                {
+                    // 竖屏模式：172x320  
+                    _width = 172;
+                    _height = 320;
+                    _xOffset = 34;  // 竖屏模式需要X偏移
+                    _yOffset = 0;
+                }
                 _isRgbPanel = true;
                 break;
 
@@ -82,11 +94,11 @@ public class ST7789Display : IDisposable
                 throw new ArgumentException("不支持的显示屏类型");
         }
 
-        Initialize();
+        Initialize(isLandscape);
     }
 
     // 初始化显示屏
-    private void Initialize()
+    private void Initialize(bool isLandscape = false)
     {
         // 硬件复位
         //HardReset();
@@ -98,7 +110,7 @@ public class ST7789Display : IDisposable
                 break;
 
             case DisplayType.Display147Inch:
-                Initialize147Inch();
+                Initialize147Inch(isLandscape);
                 break;
 
             case DisplayType.Display13Inch:
@@ -218,7 +230,7 @@ public class ST7789Display : IDisposable
     }
 
     // 初始化1.47英寸屏幕
-    private void Initialize147Inch()
+    private void Initialize147Inch(bool isLandscape = false)
     {
         // 发送初始化命令序列
         SendCommand(0x01);    // Software Reset
@@ -228,7 +240,14 @@ public class ST7789Display : IDisposable
         Thread.Sleep(120);
 
         SendCommand(0x36);    // MADCTL: Memory Data Access Control
-        SendData(0x00);       // 根据参考代码调整为0x00
+        if (isLandscape)
+        {
+            SendData(0x60);   // 横屏模式：MY=0, MX=1, MV=1
+        }
+        else
+        {
+            SendData(0x00);   // 竖屏模式：MY=0, MX=0, MV=0
+        }
 
         SendCommand(0x3A);    // COLMOD: Pixel Format Set
         SendData(0x05);       // 16-bit/pixel
@@ -517,17 +536,36 @@ public class ST7789Display : IDisposable
 
             case DisplayType.Display147Inch:
                 // 1.47寸屏幕设置
-                SendCommand(0x2A);
-                SendData((byte)(((x0) >> 8) & 0xff));
-                SendData((byte)((x0 + 34) & 0xff));
-                SendData((byte)((x1 - 1 + 34) >> 8 & 0xff));
-                SendData((byte)((x1 - 1 + 34) & 0xff));
+                if (_width == 320 && _height == 172)
+                {
+                    // 横屏模式 (320x172) - 不需要偏移
+                    SendCommand(0x2A);
+                    SendData((byte)(x0 >> 8));
+                    SendData((byte)(x0 & 0xff));
+                    SendData((byte)((x1 - 1) >> 8));
+                    SendData((byte)((x1 - 1) & 0xff));
 
-                SendCommand(0x2B);
-                SendData((byte)((y0) >> 8 & 0xff));
-                SendData((byte)((y0) & 0xff));
-                SendData((byte)((y1 - 1) >> 8 & 0xff));
-                SendData((byte)((y1 - 1) & 0xff));
+                    SendCommand(0x2B);
+                    SendData((byte)(y0 >> 8));
+                    SendData((byte)(y0 & 0xff));
+                    SendData((byte)((y1 - 1) >> 8));
+                    SendData((byte)((y1 - 1) & 0xff));
+                }
+                else
+                {
+                    // 竖屏模式 (172x320) - 需要X偏移34
+                    SendCommand(0x2A);
+                    SendData((byte)(((x0) >> 8) & 0xff));
+                    SendData((byte)((x0 + 34) & 0xff));
+                    SendData((byte)((x1 - 1 + 34) >> 8 & 0xff));
+                    SendData((byte)((x1 - 1 + 34) & 0xff));
+
+                    SendCommand(0x2B);
+                    SendData((byte)((y0) >> 8 & 0xff));
+                    SendData((byte)((y0) & 0xff));
+                    SendData((byte)((y1 - 1) >> 8 & 0xff));
+                    SendData((byte)((y1 - 1) & 0xff));
+                }
                 break;
 
             case DisplayType.Display13Inch:

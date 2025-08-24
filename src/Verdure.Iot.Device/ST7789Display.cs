@@ -68,15 +68,15 @@ public class ST7789Display : IDisposable
                     // 横屏模式：320x172
                     _width = 320;
                     _height = 172;
-                    _xOffset = 0;   // 横屏模式不需要偏移
-                    _yOffset = 0;
+                    _xOffset = 0;   // 横屏模式X偏移
+                    _yOffset = 34;  // 横屏模式可能需要Y偏移34像素
                 }
                 else
                 {
                     // 竖屏模式：172x320  
                     _width = 172;
                     _height = 320;
-                    _xOffset = 0;  // 竖屏模式需要X偏移
+                    _xOffset = 34;  // 竖屏模式需要X偏移34像素
                     _yOffset = 0;
                 }
                 _isRgbPanel = true;
@@ -535,10 +535,10 @@ public class ST7789Display : IDisposable
                 break;
 
             case DisplayType.Display147Inch:
-                // 1.47寸屏幕设置
+                // 1.47寸屏幕设置 - 偏移已在方法开头统一处理
                 if (_width == 320 && _height == 172)
                 {
-                    // 横屏模式 (320x172) - 不需要偏移
+                    // 横屏模式 (320x172) - 使用已应用偏移的坐标
                     SendCommand(0x2A);
                     SendData((byte)(x0 >> 8));
                     SendData((byte)(x0 & 0xff));
@@ -553,17 +553,17 @@ public class ST7789Display : IDisposable
                 }
                 else
                 {
-                    // 竖屏模式 (172x320) - 需要X偏移34
+                    // 竖屏模式 (172x320) - 使用已应用偏移的坐标
                     SendCommand(0x2A);
-                    SendData((byte)(((x0) >> 8) & 0xff));
-                    SendData((byte)((x0 + 34) & 0xff));
-                    SendData((byte)((x1 - 1 + 34) >> 8 & 0xff));
-                    SendData((byte)((x1 - 1 + 34) & 0xff));
+                    SendData((byte)(x0 >> 8));
+                    SendData((byte)(x0 & 0xff));
+                    SendData((byte)((x1 - 1) >> 8));
+                    SendData((byte)((x1 - 1) & 0xff));
 
                     SendCommand(0x2B);
-                    SendData((byte)((y0) >> 8 & 0xff));
-                    SendData((byte)((y0) & 0xff));
-                    SendData((byte)((y1 - 1) >> 8 & 0xff));
+                    SendData((byte)(y0 >> 8));
+                    SendData((byte)(y0 & 0xff));
+                    SendData((byte)((y1 - 1) >> 8));
                     SendData((byte)((y1 - 1) & 0xff));
                 }
                 break;

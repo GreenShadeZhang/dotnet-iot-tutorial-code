@@ -104,9 +104,9 @@ static async Task TestLandscapeMode(SpiConnectionSettings settings)
     
     for (int i = 0; i < colors.Length; i++)
     {
-        Console.WriteLine($"   显示: {colorNames[i]} - 检查是否有空白区域");
+        Console.WriteLine($"   显示: {colorNames[i]} - 检查下部是否有黑色区域");
         display.FillScreen(colors[i]);
-        await Task.Delay(2000);
+        await Task.Delay(3000); // 延长观察时间
     }
     
     // 2. 分块区域测试 - 验证不同区域都能正常显示
@@ -117,8 +117,12 @@ static async Task TestLandscapeMode(SpiConnectionSettings settings)
     Console.WriteLine("🔍 测试3: 边缘条带测试 (重点检查上边缘)");
     await DrawEdgeStripTest(display);
     
-    // 4. 渐变测试 - 验证完整显示区域
-    Console.WriteLine("🌈 测试4: 水平渐变测试");
+    // 4. 横屏专用偏移诊断测试
+    Console.WriteLine("🚨 测试4: 横屏偏移诊断测试 - 检查黑色区域问题");
+    await DiagnoseLandscapeOffset(display);
+    
+    // 5. 渐变测试 - 验证完整显示区域
+    Console.WriteLine("🌈 测试5: 水平渐变测试");
     await DrawHorizontalGradientTest(display);
     
     Console.WriteLine("✅ 横屏模式测试完成 - 应该无空白区域");
@@ -292,4 +296,66 @@ static async Task DrawHorizontalGradientTest(ST7789Display display)
     }
     
     await Task.Delay(2000);
+}
+
+// 横屏偏移诊断测试 - 专门检查下边缘黑色区域问题
+static async Task DiagnoseLandscapeOffset(ST7789Display display)
+{
+    Console.WriteLine("   🔍 诊断1: 边缘像素测试");
+    
+    // 1. 清屏为白色，便于观察
+    display.FillScreen(0xFFFF);
+    await Task.Delay(2000);
+    
+    // 2. 绘制顶部红色条带（检查是否真的在顶部）
+    Console.WriteLine("   - 绘制顶部红色条带");
+    await DrawColoredRegion(display, 0, 0, display.Width, 10, 0xF800);
+    await Task.Delay(2000);
+    
+    // 3. 绘制底部蓝色条带（检查是否真的在底部，是否有黑色区域）
+    Console.WriteLine("   - 绘制底部蓝色条带");
+    await DrawColoredRegion(display, 0, display.Height - 10, display.Width, 10, 0x001F);
+    await Task.Delay(2000);
+    
+    // 4. 绘制最底部1像素的绿色线（验证最后一行）
+    Console.WriteLine("   - 绘制最底部绿色线");
+    await DrawColoredRegion(display, 0, display.Height - 1, display.Width, 1, 0x07E0);
+    await Task.Delay(3000);
+    
+    Console.WriteLine("   🔍 诊断2: 垂直条带测试");
+    
+    // 5. 垂直分段测试 - 将屏幕分成多个水平条带
+    display.FillScreen(0x0000); // 黑色背景
+    int stripHeight = display.Height / 5;
+    ushort[] stripColors = { 0xF800, 0x07E0, 0x001F, 0xFFE0, 0xF81F };
+    string[] stripNames = { "红色", "绿色", "蓝色", "黄色", "紫色" };
+    
+    for (int i = 0; i < 5; i++)
+    {
+        int y = i * stripHeight;
+        int height = (i == 4) ? display.Height - y : stripHeight; // 最后一条占满剩余空间
+        Console.WriteLine($"   - 绘制第{i + 1}条: {stripNames[i]} (Y:{y}-{y + height - 1})");
+        await DrawColoredRegion(display, 0, y, display.Width, height, stripColors[i]);
+        await Task.Delay(1000);
+    }
+    
+    await Task.Delay(3000);
+    
+    Console.WriteLine("   🔍 诊断3: 检查实际显示尺寸");
+    // 6. 绘制网格以验证实际显示区域
+    display.FillScreen(0x0000);
+    
+    // 绘制边框
+    await DrawColoredRegion(display, 0, 0, display.Width, 2, 0xFFFF); // 顶部白线
+    await DrawColoredRegion(display, 0, display.Height - 2, display.Width, 2, 0xFFFF); // 底部白线
+    await DrawColoredRegion(display, 0, 0, 2, display.Height, 0xFFFF); // 左侧白线
+    await DrawColoredRegion(display, display.Width - 2, 0, 2, display.Height, 0xFFFF); // 右侧白线
+    
+    // 在中心绘制十字
+    int centerX = display.Width / 2;
+    int centerY = display.Height / 2;
+    await DrawColoredRegion(display, centerX - 1, 0, 2, display.Height, 0x07E0); // 垂直绿线
+    await DrawColoredRegion(display, 0, centerY - 1, display.Width, 2, 0xF800); // 水平红线
+    
+    await Task.Delay(5000);
 }

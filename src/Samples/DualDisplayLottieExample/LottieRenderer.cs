@@ -1,4 +1,5 @@
 ﻿using SkiaSharp;
+using SkiaSharp.Resources;
 using SkiaSharp.Skottie;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -9,7 +10,7 @@ public class LottieRenderer : IDisposable
 {
     private readonly string _lottieFilePath;
     private SKData _lottieData;
-    private Animation _animation;
+    private Animation? _animation;
     private double _totalFrames;
     private double _totalSeconds;
     private double _framerate;
@@ -33,7 +34,18 @@ public class LottieRenderer : IDisposable
         try
         {
             _lottieData = SKData.Create(_lottieFilePath);
-            _animation = Animation.Create(_lottieData);
+
+            using var dataUriProvider = new DataUriResourceProvider(preDecode: true);
+
+            _animation = Animation
+                .CreateBuilder()
+                .SetResourceProvider(dataUriProvider)
+                .Build(_lottieData);
+            //_animation = Animation.Create(_lottieData);
+
+            if (_animation == null)
+                throw new InvalidOperationException("无法加载Lottie动画");
+
             _totalFrames = (int)_animation.OutPoint;
             _totalSeconds = _animation.Duration.TotalSeconds;
             _framerate = _animation.Fps;

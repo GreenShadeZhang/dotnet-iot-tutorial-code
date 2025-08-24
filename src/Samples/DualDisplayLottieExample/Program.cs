@@ -36,7 +36,7 @@ try
         player = new DualLottiePlayer(
             display1, 240, 320,  // 2.4寸屏幕
             display2, 172, 320,  // 1.47寸屏幕
-            "LottieLogo.json"
+            "speak.json"
         );
     }
     else

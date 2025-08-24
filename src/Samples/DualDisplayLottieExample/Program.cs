@@ -26,7 +26,7 @@ try
     if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
     {        // 创建两个显示对象
         var display1 = new ST7789Display(settings1, gpio, true, dcPin: 25, resetPin: 27, displayType: DisplayType.Display24Inch);
-        var display2 = new ST7789Display(settings2, gpio, false, dcPin: 25, resetPin: 27, displayType: DisplayType.Display147Inch);
+        var display2 = new ST7789Display(settings2, gpio, false, dcPin: 25, resetPin: 27, displayType: DisplayType.Display147Inch, isLandscape: true);
 
         // 清屏以准备播放动画
         display1.FillScreen(0x0000);  // 黑色
@@ -35,7 +35,7 @@ try
         // 创建动画播放器
         player = new DualLottiePlayer(
             display1, 320, 240,  // 2.4寸屏幕
-            display2, 172, 320,  // 1.47寸屏幕
+            display2, 320, 172,  // 1.47寸屏幕 - 横屏模式
             "anger.mp4.lottie.json"
         );
     }
@@ -44,7 +44,7 @@ try
         // 创建动画播放器
         player = new DualLottiePlayer(
             null, 320, 240,  // 2.4寸屏幕
-            null, 172, 320,  // 1.47寸屏幕
+            null, 320, 172,  // 1.47寸屏幕 - 横屏模式
             "ask.json"
         );
     }

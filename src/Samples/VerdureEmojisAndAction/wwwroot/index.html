@@ -95,6 +95,7 @@
             <strong>当前情感:</strong> 无<br>
             <strong>开始时间:</strong> 无
         </div>
+        <button onclick="testConnection()">🔌 测试连接</button>
         <button onclick="updateStatus()">刷新状态</button>
         <button onclick="getAvailableEmotions()">获取可用表情</button>
     </div>
@@ -146,7 +147,8 @@
     </div>
 
     <script>
-        const API_BASE = 'http://localhost:5000/api/emotion';
+        // 自动检测API基础URL
+        const API_BASE = `${window.location.origin}/api/emotion`;
         
         function log(message) {
             const logDiv = document.getElementById('log');
@@ -172,20 +174,41 @@
                     options.body = JSON.stringify(body);
                 }
 
-                log(`API调用: ${method} ${endpoint}`);
-                const response = await fetch(`${API_BASE}${endpoint}`, options);
-                const data = await response.json();
+                const fullUrl = `${API_BASE}${endpoint}`;
+                log(`API调用: ${method} ${fullUrl}`);
                 
-                if (response.ok) {
-                    log(`✅ 成功: ${data.message || JSON.stringify(data)}`);
-                    return data;
-                } else {
-                    log(`❌ 失败: ${data.message || response.statusText}`);
+                const response = await fetch(fullUrl, options);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    log(`❌ HTTP错误 ${response.status}: ${errorText}`);
                     return null;
                 }
+                
+                const contentType = response.headers.get('content-type');
+                let data;
+                
+                if (contentType && contentType.includes('application/json')) {
+                    data = await response.json();
+                } else {
+                    const text = await response.text();
+                    data = { message: text };
+                }
+                
+                log(`✅ 成功: ${data.message || JSON.stringify(data).substring(0, 100)}`);
+                return data;
             } catch (error) {
-                log(`❌ 错误: ${error.message}`);
+                log(`❌ 网络错误: ${error.message}`);
                 return null;
+            }
+        }
+
+        async function testConnection() {
+            const result = await apiCall('/test');
+            if (result) {
+                log(`🔌 连接测试成功: ${result.message} (${result.timestamp})`);
+            } else {
+                log('🔌 连接测试失败');
             }
         }
 
@@ -194,7 +217,7 @@
             if (status) {
                 const statusDiv = document.getElementById('status');
                 statusDiv.innerHTML = `
-                    <strong>状态:</strong> ${status.status}<br>
+                    <strong>状态:</strong> ${status.status || '未知'}<br>
                     <strong>当前情感:</strong> ${status.currentEmotion || '无'}<br>
                     <strong>开始时间:</strong> ${status.startTime ? new Date(status.startTime).toLocaleString() : '无'}<br>
                     <strong>当前循环:</strong> ${status.currentLoop || 0}<br>
@@ -205,8 +228,8 @@
 
         async function getAvailableEmotions() {
             const emotions = await apiCall('/emotions');
-            if (emotions) {
-                log(`可用表情: ${emotions.map(e => e.name).join(', ')}`);
+            if (emotions && Array.isArray(emotions)) {
+                log(`可用表情: ${emotions.map(e => e.name || e.type).join(', ')}`);
             }
         }
 
@@ -214,14 +237,19 @@
             const loops = parseInt(document.getElementById('loops').value) || 1;
             const fps = parseInt(document.getElementById('fps').value) || 30;
             
+            // 确保枚举值正确匹配C#枚举
+            const emotionTypeValue = emotionType === 'Happy' ? 'Happy' : 
+                                   emotionType === 'Anger' ? 'Anger' : emotionType;
+            
             const request = {
-                emotionType: emotionType,
+                emotionType: emotionTypeValue,
                 includeAction: includeAction,
                 includeEmotion: includeEmotion,
                 loops: loops,
                 fps: fps
             };
 
+            log(`发送播放请求: ${JSON.stringify(request)}`);
             await apiCall('/play', 'POST', request);
             setTimeout(updateStatus, 500);
         }
@@ -231,10 +259,10 @@
             const fps = parseInt(document.getElementById('fps').value) || 30;
             
             const params = new URLSearchParams({
-                includeAction: includeAction,
-                includeEmotion: includeEmotion,
-                loops: loops,
-                fps: fps
+                includeAction: includeAction.toString(),
+                includeEmotion: includeEmotion.toString(),
+                loops: loops.toString(),
+                fps: fps.toString()
             });
 
             await apiCall(`/play-random?${params}`, 'POST');
@@ -274,9 +302,16 @@
 
         // 页面加载时更新状态
         window.onload = function() {
-            log('🚀 VerdureEmojisAndAction 控制面板已加载');
-            updateStatus();
-            getAvailableEmotions();
+            log(`🚀 VerdureEmojisAndAction 控制面板已加载`);
+            log(`API基础地址: ${API_BASE}`);
+            
+            // 先测试连接
+            testConnection();
+            
+            setTimeout(() => {
+                updateStatus();
+                getAvailableEmotions();
+            }, 1000);
             
             // 每5秒自动更新状态
             setInterval(updateStatus, 5000);

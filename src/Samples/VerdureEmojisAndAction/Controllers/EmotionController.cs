@@ -21,6 +21,22 @@ public class EmotionController : ControllerBase
     }
 
     /// <summary>
+    /// 测试API连接
+    /// </summary>
+    /// <returns>测试结果</returns>
+    [HttpGet("test")]
+    public IActionResult Test()
+    {
+        _logger.LogInformation("收到测试请求");
+        return Ok(new { 
+            success = true, 
+            message = "API连接正常", 
+            timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+            server = Environment.MachineName
+        });
+    }
+
+    /// <summary>
     /// 播放指定的表情和动作
     /// </summary>
     /// <param name="request">播放请求</param>
@@ -30,7 +46,12 @@ public class EmotionController : ControllerBase
     {
         try
         {
-            _logger.LogInformation($"收到播放请求: {request.EmotionType}");
+            _logger.LogInformation($"收到播放请求: EmotionType={request.EmotionType}, IncludeAction={request.IncludeAction}, IncludeEmotion={request.IncludeEmotion}, Loops={request.Loops}, Fps={request.Fps}");
+            
+            if (request.EmotionType == null)
+            {
+                return BadRequest(new { success = false, message = "表情类型不能为空" });
+            }
             
             var result = await _emotionActionService.PlayEmotionWithActionAsync(request);
             

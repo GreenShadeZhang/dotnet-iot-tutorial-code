@@ -1,0 +1,6 @@
+@VerdureEmojisAndAction_HostAddress = http://localhost:5296
+
+GET {{VerdureEmojisAndAction_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

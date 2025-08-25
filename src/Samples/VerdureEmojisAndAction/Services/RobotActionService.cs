@@ -32,7 +32,7 @@ public class RobotActionService : IDisposable
         _joints[2] = new JointStatus
         {
             Id = 2,
-            Name = "头部",
+            Name = "待定",
             ServoAngleMin = 70,
             ServoAngleMax = 95,
             ModelAngleMin = -15,
@@ -44,7 +44,7 @@ public class RobotActionService : IDisposable
         _joints[4] = new JointStatus
         {
             Id = 4,
-            Name = "左臂展开",
+            Name = "左耳旋转",
             ServoAngleMin = 30,
             ServoAngleMax = 90,
             ModelAngleMin = 0,
@@ -68,7 +68,7 @@ public class RobotActionService : IDisposable
         _joints[8] = new JointStatus
         {
             Id = 8,
-            Name = "右臂展开",
+            Name = "右耳旋转",
             ServoAngleMin = 120,
             ServoAngleMax = 180,
             ModelAngleMin = 0,
@@ -92,7 +92,7 @@ public class RobotActionService : IDisposable
         _joints[12] = new JointStatus
         {
             Id = 12,
-            Name = "底部旋转",
+            Name = "脖子旋转",
             ServoAngleMin = 0,
             ServoAngleMax = 180,
             ModelAngleMin = -90,
@@ -245,40 +245,121 @@ public class RobotActionService : IDisposable
     }
 
     /// <summary>
+    /// 执行中性/放松动作 - 轻柔的自然动作
+    /// </summary>
+    public async Task PerformRelaxActionAsync(CancellationToken cancellationToken = default)
+    {
+        _logger.LogDebug("开始执行放松动作序列");
+        
+        // 轻柔的耳朵活动
+        for (int i = 0; i < 2; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            
+            await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+            {
+                { 4, 10 },    // 左耳轻微活动
+                { 8, 10 },    // 右耳轻微活动
+                { 12, -15 }   // 脖子轻柔向左
+            }, cancellationToken);
+            await Task.Delay(800, cancellationToken);
+
+            await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+            {
+                { 4, 0 },     // 左耳放松
+                { 8, 0 },     // 右耳放松
+                { 12, 15 }    // 脖子轻柔向右
+            }, cancellationToken);
+            await Task.Delay(800, cancellationToken);
+        }
+
+        // 缓慢的手臂舒展
+        await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+        {
+            { 6, 60 },    // 左臂轻微张开
+            { 10, 120 },  // 右臂轻微张开
+            { 12, 0 }     // 脖子回正
+        }, cancellationToken);
+        await Task.Delay(1000, cancellationToken);
+
+        // 回到放松状态
+        await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+        {
+            { 4, 0 },    // 左耳放下
+            { 6, 90 },   // 左臂中位
+            { 8, 0 },    // 右耳放下
+            { 10, 90 },  // 右臂中位
+            { 12, 0 }    // 脖子居中
+        }, cancellationToken);
+        
+        _logger.LogDebug("放松动作序列执行完成");
+    }
+
+    /// <summary>
     /// 执行愤怒动作
     /// </summary>
     private async Task PerformAngerActionAsync(CancellationToken cancellationToken)
     {
-        // 愤怒动作：手臂张开，头部晃动
+        _logger.LogDebug("开始执行愤怒动作序列");
+        
+        // 第一阶段：威胁姿态 - 双臂张开，耳朵竖起，脖子向前
         await SetMultipleJointAnglesAsync(new Dictionary<int, float>
         {
-            { 4, 25 },    // 左臂张开
-            { 8, 25 },    // 右臂张开
-            { 6, 45 },    // 左臂前伸
-            { 10, 135 },  // 右臂前伸
+            { 4, 25 },    // 左耳旋转到最大角度
+            { 8, 25 },    // 右耳旋转到最大角度  
+            { 6, 30 },    // 左臂向前威胁
+            { 10, 150 },  // 右臂向前威胁
+            { 12, -30 }   // 脖子稍微向左转
         }, cancellationToken);
 
-        await Task.Delay(300, cancellationToken);
+        await Task.Delay(500, cancellationToken);
 
-        // 头部左右晃动
-        for (int i = 0; i < 3; i++)
+        // 第二阶段：激烈的脖子旋转 + 头部晃动 + 手臂挥舞
+        for (int i = 0; i < 4; i++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await SetJointModelAngleAsync(2, -12, cancellationToken);
-            await Task.Delay(200, cancellationToken);
-            await SetJointModelAngleAsync(2, 12, cancellationToken);
-            await Task.Delay(200, cancellationToken);
+            
+            // 脖子快速左右旋转 + 手臂挥舞
+            await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+            {
+                { 12, -60 },  // 脖子向左转
+                { 6, 0 },     // 左臂快速挥动
+                { 10, 180 }   // 右臂快速挥动
+            }, cancellationToken);
+            await Task.Delay(150, cancellationToken);
+
+            await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+            {
+                { 12, 60 },   // 脖子向右转
+                { 6, 60 },    // 左臂挥动
+                { 10, 120 }   // 右臂挥动
+            }, cancellationToken);
+            await Task.Delay(150, cancellationToken);
         }
+
+        // 第三阶段：最后的威胁 - 脖子居中，手臂交叉威胁
+        await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+        {
+            { 12, 0 },    // 脖子正面对准
+            { 6, 45 },    // 左臂交叉
+            { 10, 135 },  // 右臂交叉
+            { 4, 30 },    // 左耳保持竖立
+            { 8, 30 }     // 右耳保持竖立
+        }, cancellationToken);
+        
+        await Task.Delay(800, cancellationToken);
 
         // 回到中位
         await SetMultipleJointAnglesAsync(new Dictionary<int, float>
         {
-            { 2, 0 },    // 头部居中
-            { 4, 0 },    // 左臂收起
+            { 4, 0 },    // 左耳放下
             { 6, 90 },   // 左臂中位
-            { 8, 0 },    // 右臂收起
+            { 8, 0 },    // 右耳放下
             { 10, 90 },  // 右臂中位
+            { 12, 0 }    // 脖子居中
         }, cancellationToken);
+        
+        _logger.LogDebug("愤怒动作序列执行完成");
     }
 
     /// <summary>
@@ -286,33 +367,102 @@ public class RobotActionService : IDisposable
     /// </summary>
     private async Task PerformHappyActionAsync(CancellationToken cancellationToken)
     {
-        // 快乐动作：挥手，点头
-        // 右臂挥手动作
+        _logger.LogDebug("开始执行快乐动作序列");
+        
+        // 第一阶段：欢迎姿态 - 双臂张开欢迎，耳朵活动
+        await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+        {
+            { 4, 15 },    // 左耳轻微活动
+            { 8, 15 },    // 右耳轻微活动
+            { 6, 45 },    // 左臂张开
+            { 10, 135 },  // 右臂张开
+            { 12, 0 }     // 脖子正面
+        }, cancellationToken);
+
+        await Task.Delay(400, cancellationToken);
+
+        // 第二阶段：左右挥手 + 脖子轻柔左右摆动 + 耳朵活动
         for (int i = 0; i < 3; i++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await SetJointModelAngleAsync(10, 45, cancellationToken);  // 右臂向前
-            await Task.Delay(300, cancellationToken);
-            await SetJointModelAngleAsync(10, 135, cancellationToken); // 右臂向后
-            await Task.Delay(300, cancellationToken);
+            
+            // 向左挥手 + 脖子配合转动
+            await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+            {
+                { 6, 0 },     // 左臂向左挥
+                { 10, 180 },  // 右臂向右挥
+                { 12, -25 },  // 脖子轻柔向左转
+                { 4, 25 },    // 左耳活跃
+                { 8, 5 }      // 右耳稍微活动
+            }, cancellationToken);
+            await Task.Delay(400, cancellationToken);
+
+            // 向右挥手 + 脖子配合转动
+            await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+            {
+                { 6, 90 },    // 左臂向中间
+                { 10, 90 },   // 右臂向中间
+                { 12, 25 },   // 脖子轻柔向右转
+                { 4, 5 },     // 左耳稍微活动
+                { 8, 25 }     // 右耳活跃
+            }, cancellationToken);
+            await Task.Delay(400, cancellationToken);
         }
 
-        // 头部点头动作
+        // 第三阶段：点头 + 耳朵一起摆动表示友好
+        for (int i = 0; i < 3; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            
+            // 头部向下点头，耳朵同时活动
+            await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+            {
+                { 4, 20 },    // 左耳活动
+                { 8, 20 },    // 右耳活动
+                { 12, -10 }   // 脖子稍微配合
+            }, cancellationToken);
+            await Task.Delay(250, cancellationToken);
+            
+            // 头部向上，耳朵放松
+            await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+            {
+                { 4, 5 },     // 左耳放松
+                { 8, 5 },     // 右耳放松
+                { 12, 10 }    // 脖子稍微配合
+            }, cancellationToken);
+            await Task.Delay(250, cancellationToken);
+        }
+
+        // 第四阶段：最后的庆祝 - 双臂高举，脖子左右快乐摆动
+        await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+        {
+            { 6, 15 },    // 左臂高举
+            { 10, 165 },  // 右臂高举
+            { 4, 30 },    // 左耳最大活动
+            { 8, 30 }     // 右耳最大活动
+        }, cancellationToken);
+
+        // 快乐的脖子摆动
         for (int i = 0; i < 2; i++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            await SetJointModelAngleAsync(2, -8, cancellationToken);  // 头部向下
-            await Task.Delay(250, cancellationToken);
-            await SetJointModelAngleAsync(2, 8, cancellationToken);   // 头部向上
-            await Task.Delay(250, cancellationToken);
+            await SetJointModelAngleAsync(12, -40, cancellationToken);
+            await Task.Delay(200, cancellationToken);
+            await SetJointModelAngleAsync(12, 40, cancellationToken);
+            await Task.Delay(200, cancellationToken);
         }
 
         // 回到中位
         await SetMultipleJointAnglesAsync(new Dictionary<int, float>
         {
-            { 2, 0 },    // 头部居中
+            { 4, 0 },    // 左耳放下
+            { 6, 90 },   // 左臂中位
+            { 8, 0 },    // 右耳放下
             { 10, 90 },  // 右臂中位
+            { 12, 0 }    // 脖子居中
         }, cancellationToken);
+        
+        _logger.LogDebug("快乐动作序列执行完成");
     }
 
     /// <summary>
@@ -333,12 +483,11 @@ public class RobotActionService : IDisposable
         // 设置初始位置
         await SetMultipleJointAnglesAsync(new Dictionary<int, float>
         {
-            { 2, 0 },    // 头部居中
-            { 4, 0 },    // 左臂收起
+            { 4, 0 },    // 左耳放下
             { 6, 90 },   // 左臂中位
-            { 8, 0 },    // 右臂收起
+            { 8, 0 },    // 右耳放下
             { 10, 90 },  // 右臂中位
-            { 12, 0 }    // 底部居中
+            { 12, 0 }    // 脖子居中
         }, cancellationToken);
     }
 

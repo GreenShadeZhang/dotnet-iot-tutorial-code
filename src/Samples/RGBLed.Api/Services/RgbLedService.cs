@@ -27,13 +27,19 @@ public class RgbLedService : IDisposable
     private int _currentBrightness = 100;
     private int _currentSpeed = 1000;
     
+    // 按钮防抖动
+    private DateTime _lastButton1Press = DateTime.MinValue;
+    private DateTime _lastButton2Press = DateTime.MinValue;
+    private DateTime _lastButton3Press = DateTime.MinValue;
+    private readonly TimeSpan _debounceInterval = TimeSpan.FromMilliseconds(200);
+    
     // 事件
     public event Action<int>? ButtonPressed;
     public event Action<LedStatus>? StatusChanged;
 
     public RgbLedService(
         int redPin = 18, int greenPin = 19, int bluePin = 20,
-        int button1Pin = 2, int button2Pin = 3, int button3Pin = 4,
+        int button1Pin = 2, int button2Pin = 3, int button3Pin = 17,
         int pwmChip = 0)
     {
         _gpio = new GpioController();
@@ -90,23 +96,44 @@ public class RgbLedService : IDisposable
 
     private void OnButton1Pressed(object sender, PinValueChangedEventArgs e)
     {
+        var now = DateTime.UtcNow;
+        if (now - _lastButton1Press < _debounceInterval)
+            return;
+            
+        _lastButton1Press = now;
         ButtonPressed?.Invoke(1);
+        
         // 按钮1: 切换颜色
         CycleColor();
+        Console.WriteLine($"按钮1按下 - 当前颜色: R:{_currentColor.R} G:{_currentColor.G} B:{_currentColor.B}");
     }
 
     private void OnButton2Pressed(object sender, PinValueChangedEventArgs e)
     {
+        var now = DateTime.UtcNow;
+        if (now - _lastButton2Press < _debounceInterval)
+            return;
+            
+        _lastButton2Press = now;
         ButtonPressed?.Invoke(2);
+        
         // 按钮2: 切换效果
         CycleEffect();
+        Console.WriteLine($"按钮2按下 - 当前效果: {_currentEffect}");
     }
 
     private void OnButton3Pressed(object sender, PinValueChangedEventArgs e)
     {
+        var now = DateTime.UtcNow;
+        if (now - _lastButton3Press < _debounceInterval)
+            return;
+            
+        _lastButton3Press = now;
         ButtonPressed?.Invoke(3);
+        
         // 按钮3: 调整亮度
         CycleBrightness();
+        Console.WriteLine($"按钮3按下 - 当前亮度: {_currentBrightness}%");
     }
 
     /// <summary>
@@ -126,6 +153,7 @@ public class RgbLedService : IDisposable
         await StartEffect();
         
         NotifyStatusChanged();
+        Console.WriteLine($"设置效果: {_currentEffect}, 颜色: R:{_currentColor.R} G:{_currentColor.G} B:{_currentColor.B}, 亮度: {_currentBrightness}%");
     }
 
     private void StopCurrentEffect()
@@ -184,61 +212,75 @@ public class RgbLedService : IDisposable
 
     private async Task BlinkEffect(CancellationToken cancellationToken)
     {
+        Console.WriteLine("开始闪烁效果");
         while (!cancellationToken.IsCancellationRequested)
         {
+            // 亮
             SetColor(_currentColor);
             await Task.Delay(_currentSpeed / 2, cancellationToken);
             
             if (cancellationToken.IsCancellationRequested) break;
             
+            // 灭
             SetColor(LedColor.Black);
             await Task.Delay(_currentSpeed / 2, cancellationToken);
         }
+        Console.WriteLine("闪烁效果结束");
     }
 
     private async Task BreatheEffect(CancellationToken cancellationToken)
     {
+        Console.WriteLine("开始呼吸灯效果");
         while (!cancellationToken.IsCancellationRequested)
         {
-            // 渐亮
-            for (int i = 0; i <= 100 && !cancellationToken.IsCancellationRequested; i += 2)
+            // 渐亮阶段 - 从0%到100%
+            for (int i = 0; i <= 100 && !cancellationToken.IsCancellationRequested; i += 1)
             {
-                var brightness = i / 100.0;
+                var breatheBrightness = (i / 100.0) * (_currentBrightness / 100.0);
                 var color = new LedColor(
-                    (byte)(_currentColor.R * brightness),
-                    (byte)(_currentColor.G * brightness),
-                    (byte)(_currentColor.B * brightness)
+                    (byte)(_currentColor.R * breatheBrightness),
+                    (byte)(_currentColor.G * breatheBrightness),
+                    (byte)(_currentColor.B * breatheBrightness)
                 );
                 SetColor(color);
-                await Task.Delay(_currentSpeed / 100, cancellationToken);
+                await Task.Delay(_currentSpeed / 200, cancellationToken); // 更平滑的变化
             }
             
-            // 渐暗
-            for (int i = 100; i >= 0 && !cancellationToken.IsCancellationRequested; i -= 2)
+            // 短暂停留在最亮状态
+            await Task.Delay(_currentSpeed / 10, cancellationToken);
+            
+            // 渐暗阶段 - 从100%到0%
+            for (int i = 100; i >= 0 && !cancellationToken.IsCancellationRequested; i -= 1)
             {
-                var brightness = i / 100.0;
+                var breatheBrightness = (i / 100.0) * (_currentBrightness / 100.0);
                 var color = new LedColor(
-                    (byte)(_currentColor.R * brightness),
-                    (byte)(_currentColor.G * brightness),
-                    (byte)(_currentColor.B * brightness)
+                    (byte)(_currentColor.R * breatheBrightness),
+                    (byte)(_currentColor.G * breatheBrightness),
+                    (byte)(_currentColor.B * breatheBrightness)
                 );
                 SetColor(color);
-                await Task.Delay(_currentSpeed / 100, cancellationToken);
+                await Task.Delay(_currentSpeed / 200, cancellationToken); // 更平滑的变化
             }
+            
+            // 短暂停留在最暗状态
+            await Task.Delay(_currentSpeed / 10, cancellationToken);
         }
+        Console.WriteLine("呼吸灯效果结束");
     }
 
     private async Task RainbowEffect(CancellationToken cancellationToken)
     {
+        Console.WriteLine("开始彩虹效果");
         int hue = 0;
         while (!cancellationToken.IsCancellationRequested)
         {
             var color = HsvToRgb(hue, 1.0, 1.0);
             SetColor(color);
             
-            hue = (hue + 1) % 360;
-            await Task.Delay(_currentSpeed / 36, cancellationToken);
+            hue = (hue + 2) % 360; // 稍快一点的变化
+            await Task.Delay(_currentSpeed / 180, cancellationToken); // 根据速度调整
         }
+        Console.WriteLine("彩虹效果结束");
     }
 
     private LedColor HsvToRgb(double h, double s, double v)
@@ -278,6 +320,7 @@ public class RgbLedService : IDisposable
         var nextIndex = (currentIndex + 1) % colors.Length;
         _currentColor = colors[nextIndex];
         
+        // 如果当前是静态效果，立即更新颜色
         if (_currentEffect == LedEffect.Static)
         {
             SetColor(_currentColor);
@@ -294,6 +337,7 @@ public class RgbLedService : IDisposable
         
         _currentEffect = effects[nextIndex];
         
+        // 异步重新启动效果
         Task.Run(async () =>
         {
             StopCurrentEffect();
@@ -310,10 +354,12 @@ public class RgbLedService : IDisposable
         
         _currentBrightness = levels[nextIndex];
         
+        // 立即应用新的亮度设置
         if (_currentEffect == LedEffect.Static)
         {
             SetColor(_currentColor);
         }
+        // 对于动态效果，亮度会在下次更新时生效
         
         NotifyStatusChanged();
     }

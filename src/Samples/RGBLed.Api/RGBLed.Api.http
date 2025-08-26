@@ -1,4 +1,64 @@
-@RGBLed.Api_HostAddress = http://localhost:5182
+@RGBLed.Api_HostAddress = http://localhost:5000
+
+### 获取LED状态
+GET {{RGBLed.Api_HostAddress}}/api/led/status
+
+### 关闭LED
+POST {{RGBLed.Api_HostAddress}}/api/led/off
+
+### 设置红色静态灯
+POST {{RGBLed.Api_HostAddress}}/api/led/color
+Content-Type: application/json
+
+{
+  "r": 255,
+  "g": 0,
+  "b": 0
+}
+
+### 设置蓝色闪烁
+POST {{RGBLed.Api_HostAddress}}/api/led/blink?speed=500&brightness=80
+Content-Type: application/json
+
+{
+  "r": 0,
+  "g": 0,
+  "b": 255
+}
+
+### 设置绿色呼吸灯
+POST {{RGBLed.Api_HostAddress}}/api/led/breathe?speed=2000&brightness=100
+Content-Type: application/json
+
+{
+  "r": 0,
+  "g": 255,
+  "b": 0
+}
+
+### 设置彩虹效果
+POST {{RGBLed.Api_HostAddress}}/api/led/rainbow?speed=3000&brightness=90
+
+### 设置自定义效果
+POST {{RGBLed.Api_HostAddress}}/api/led/effect
+Content-Type: application/json
+
+{
+  "effect": "Breathe",
+  "color": {
+    "r": 255,
+    "g": 165,
+    "b": 0
+  },
+  "brightness": 75,
+  "speed": 1500
+}
+
+### 获取预定义颜色
+GET {{RGBLed.Api_HostAddress}}/api/led/colors
+
+### 获取可用效果
+GET {{RGBLed.Api_HostAddress}}/api/led/effectsd.Api_HostAddress = http://localhost:5182
 
 GET {{RGBLed.Api_HostAddress}}/weatherforecast/
 Accept: application/json

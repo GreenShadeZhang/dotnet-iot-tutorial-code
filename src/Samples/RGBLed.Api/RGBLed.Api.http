@@ -1,0 +1,6 @@
+@RGBLed.Api_HostAddress = http://localhost:5182
+
+GET {{RGBLed.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

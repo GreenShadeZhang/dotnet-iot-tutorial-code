@@ -31,6 +31,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LandscapeDisplayTest", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VerdureEmojisAndAction", "src\Samples\VerdureEmojisAndAction\VerdureEmojisAndAction.csproj", "{26A6CEA8-AF4C-43BE-9FDB-8AE5B2101788}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RGBLed.Api", "src\Samples\RGBLed.Api\RGBLed.Api.csproj", "{EAC1CEE4-3211-4439-8B0E-E92AC8F34624}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -89,6 +91,10 @@ Global
 		{26A6CEA8-AF4C-43BE-9FDB-8AE5B2101788}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{26A6CEA8-AF4C-43BE-9FDB-8AE5B2101788}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{26A6CEA8-AF4C-43BE-9FDB-8AE5B2101788}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EAC1CEE4-3211-4439-8B0E-E92AC8F34624}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EAC1CEE4-3211-4439-8B0E-E92AC8F34624}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EAC1CEE4-3211-4439-8B0E-E92AC8F34624}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EAC1CEE4-3211-4439-8B0E-E92AC8F34624}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -104,6 +110,7 @@ Global
 		{2C9ECD00-FC72-4ACC-A47A-A33DD4778351} = {A5139A99-41C9-4808-A175-7D83D860F646}
 		{5C085581-0054-CE21-85F9-CCC718027357} = {A5139A99-41C9-4808-A175-7D83D860F646}
 		{26A6CEA8-AF4C-43BE-9FDB-8AE5B2101788} = {A5139A99-41C9-4808-A175-7D83D860F646}
+		{EAC1CEE4-3211-4439-8B0E-E92AC8F34624} = {A5139A99-41C9-4808-A175-7D83D860F646}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5B15746B-2C90-40D5-A8AE-AE81B6B7766F}

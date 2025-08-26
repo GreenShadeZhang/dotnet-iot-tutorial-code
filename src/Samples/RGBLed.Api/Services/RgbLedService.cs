@@ -22,7 +22,7 @@ public class RgbLedService : IDisposable
     private CancellationTokenSource? _effectCancellationSource;
     private Task? _effectTask;
     
-    private LedEffect _currentEffect = LedEffect.Off;
+    private string _currentEffect = LedEffect.Off;
     private LedColor _currentColor = LedColor.Black;
     private int _currentBrightness = 100;
     private int _currentSpeed = 1000;
@@ -288,7 +288,7 @@ public class RgbLedService : IDisposable
 
     private void CycleEffect()
     {
-        var effects = Enum.GetValues<LedEffect>();
+        var effects = LedEffect.All;
         var currentIndex = Array.IndexOf(effects, _currentEffect);
         var nextIndex = (currentIndex + 1) % effects.Length;
         
@@ -328,7 +328,7 @@ public class RgbLedService : IDisposable
             Speed = _currentSpeed,
             IsRunning = _effectTask?.Status == TaskStatus.Running,
             AvailableColors = new[] { "Red", "Green", "Blue", "Yellow", "Cyan", "Magenta", "White", "Orange", "Purple" },
-            AvailableEffects = Enum.GetNames<LedEffect>()
+            AvailableEffects = LedEffect.All
         };
     }
 

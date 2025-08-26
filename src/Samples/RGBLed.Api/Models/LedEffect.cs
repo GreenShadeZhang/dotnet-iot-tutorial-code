@@ -3,32 +3,37 @@ namespace RGBLed.Api.Models;
 /// <summary>
 /// LED效果类型
 /// </summary>
-public enum LedEffect
+public static class LedEffect
 {
     /// <summary>
     /// 关闭
     /// </summary>
-    Off,
+    public const string Off = "Off";
     
     /// <summary>
     /// 静态颜色
     /// </summary>
-    Static,
+    public const string Static = "Static";
     
     /// <summary>
     /// 闪烁
     /// </summary>
-    Blink,
+    public const string Blink = "Blink";
     
     /// <summary>
     /// 呼吸灯
     /// </summary>
-    Breathe,
+    public const string Breathe = "Breathe";
     
     /// <summary>
     /// 彩虹循环
     /// </summary>
-    Rainbow
+    public const string Rainbow = "Rainbow";
+
+    /// <summary>
+    /// 获取所有可用效果
+    /// </summary>
+    public static string[] All => new[] { Off, Static, Blink, Breathe, Rainbow };
 }
 
 /// <summary>
@@ -70,7 +75,7 @@ public class LedControlRequest
     /// <summary>
     /// 效果类型
     /// </summary>
-    public LedEffect Effect { get; set; }
+    public string Effect { get; set; } = LedEffect.Static;
     
     /// <summary>
     /// 颜色
@@ -93,7 +98,7 @@ public class LedControlRequest
 /// </summary>
 public class LedStatus
 {
-    public LedEffect CurrentEffect { get; set; }
+    public string CurrentEffect { get; set; } = LedEffect.Off;
     public LedColor CurrentColor { get; set; } = LedColor.Black;
     public int Brightness { get; set; }
     public int Speed { get; set; }

@@ -200,7 +200,7 @@ public class LedController : ControllerBase
     [HttpGet("effects")]
     public ActionResult<string[]> GetAvailableEffects()
     {
-        var effects = Enum.GetNames<LedEffect>();
+        var effects = LedEffect.All;
         return Ok(effects);
     }
 }

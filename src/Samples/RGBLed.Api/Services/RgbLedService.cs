@@ -39,7 +39,7 @@ public class RgbLedService : IDisposable
 
     public RgbLedService(
         int redPin = 18, int greenPin = 19, int bluePin = 20,
-        int button1Pin = 2, int button2Pin = 3, int button3Pin = 17,
+        int button1Pin = 2, int button2Pin = 3, int button3Pin = 14,
         int pwmChip = 0)
     {
         _gpio = new GpioController();
@@ -158,22 +158,64 @@ public class RgbLedService : IDisposable
 
     private void StopCurrentEffect()
     {
-        _effectCancellationSource?.Cancel();
-        _effectTask?.Wait(1000);
-        _effectCancellationSource?.Dispose();
+        try
+        {
+            if (_effectCancellationSource != null)
+            {
+                Console.WriteLine("停止当前效果...");
+                _effectCancellationSource.Cancel();
+                
+                if (_effectTask != null && !_effectTask.IsCompleted)
+                {
+                    var completed = _effectTask.Wait(1000);
+                    if (!completed)
+                    {
+                        Console.WriteLine("警告: 效果任务停止超时");
+                    }
+                    else
+                    {
+                        Console.WriteLine("当前效果已停止");
+                    }
+                }
+                
+                _effectCancellationSource.Dispose();
+                _effectCancellationSource = null;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"停止效果时出错: {ex.Message}");
+        }
     }
 
     private async Task StartEffect()
     {
         _effectCancellationSource = new CancellationTokenSource();
         
+        Console.WriteLine($"启动效果: {_currentEffect}");
+        
         _effectTask = _currentEffect switch
         {
-            LedEffect.Off => Task.Run(() => SetColor(LedColor.Black)),
-            LedEffect.Static => Task.Run(() => SetColor(_currentColor)),
-            LedEffect.Blink => Task.Run(() => BlinkEffect(_effectCancellationSource.Token)),
-            LedEffect.Breathe => Task.Run(() => BreatheEffect(_effectCancellationSource.Token)),
-            LedEffect.Rainbow => Task.Run(() => RainbowEffect(_effectCancellationSource.Token)),
+            LedEffect.Off => Task.Run(() => {
+                Console.WriteLine("执行关闭效果");
+                SetColor(LedColor.Black);
+            }),
+            LedEffect.Static => Task.Run(() => {
+                Console.WriteLine("执行静态效果");
+                SetColor(_currentColor);
+            }),
+            LedEffect.Blink => Task.Run(() => {
+                Console.WriteLine("执行闪烁效果");
+                BlinkEffect(_effectCancellationSource.Token);
+            }),
+            LedEffect.Breathe => Task.Run(() => {
+                Console.WriteLine("执行呼吸效果");
+                BreatheEffect(_effectCancellationSource.Token);
+            }),
+            LedEffect.Rainbow => Task.Run(() => {
+                Console.WriteLine("执行彩虹效果");
+                RainbowEffect(_effectCancellationSource.Token);
+            }),
             _ => Task.CompletedTask
         };
         
@@ -187,21 +229,37 @@ public class RgbLedService : IDisposable
         var green = (byte)(color.G * brightness);
         var blue = (byte)(color.B * brightness);
 
+        Console.WriteLine($"设置颜色: 原始RGB({color.R},{color.G},{color.B}) -> 亮度调整后RGB({red},{green},{blue}) [亮度:{_currentBrightness}%]");
+
         if (_redChannel != null && _greenChannel != null && _blueChannel != null)
         {
             // 使用PWM
-            _redChannel.DutyCycle = red / 255.0;
-            _greenChannel.DutyCycle = green / 255.0;
-            _blueChannel.DutyCycle = blue / 255.0;
+            try
+            {
+                _redChannel.DutyCycle = red / 255.0;
+                _greenChannel.DutyCycle = green / 255.0;
+                _blueChannel.DutyCycle = blue / 255.0;
+                Console.WriteLine($"PWM设置成功: R={red / 255.0:F3} G={green / 255.0:F3} B={blue / 255.0:F3}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"PWM设置失败: {ex.Message}");
+            }
         }
         else
         {
             // 使用GPIO (简单开关)
             try
             {
-                _gpio.Write(18, red > 127 ? PinValue.High : PinValue.Low);
-                _gpio.Write(19, green > 127 ? PinValue.High : PinValue.Low);
-                _gpio.Write(20, blue > 127 ? PinValue.High : PinValue.Low);
+                var redState = red > 127 ? PinValue.High : PinValue.Low;
+                var greenState = green > 127 ? PinValue.High : PinValue.Low;
+                var blueState = blue > 127 ? PinValue.High : PinValue.Low;
+                
+                _gpio.Write(18, redState);
+                _gpio.Write(19, greenState);
+                _gpio.Write(20, blueState);
+                
+                Console.WriteLine($"GPIO设置成功: 红={redState} 绿={greenState} 蓝={blueState}");
             }
             catch (Exception ex)
             {
@@ -320,10 +378,18 @@ public class RgbLedService : IDisposable
         var nextIndex = (currentIndex + 1) % colors.Length;
         _currentColor = colors[nextIndex];
         
-        // 如果当前是静态效果，立即更新颜色
+        Console.WriteLine($"切换颜色到: R:{_currentColor.R} G:{_currentColor.G} B:{_currentColor.B}");
+        
+        // 对于静态效果，立即更新颜色
         if (_currentEffect == LedEffect.Static)
         {
             SetColor(_currentColor);
+            Console.WriteLine("静态模式 - 立即更新颜色");
+        }
+        // 对于动态效果，颜色会在下次循环时生效
+        else if (_currentEffect != LedEffect.Off)
+        {
+            Console.WriteLine("动态模式 - 颜色将在下次循环生效");
         }
         
         NotifyStatusChanged();
@@ -335,15 +401,26 @@ public class RgbLedService : IDisposable
         var currentIndex = Array.IndexOf(effects, _currentEffect);
         var nextIndex = (currentIndex + 1) % effects.Length;
         
+        var oldEffect = _currentEffect;
         _currentEffect = effects[nextIndex];
         
-        // 异步重新启动效果
-        Task.Run(async () =>
+        Console.WriteLine($"效果切换: {oldEffect} -> {_currentEffect}");
+        
+        // 同步重新启动效果，避免异步可能的问题
+        try
         {
             StopCurrentEffect();
-            await StartEffect();
-            NotifyStatusChanged();
-        });
+            Task.Run(async () =>
+            {
+                await StartEffect();
+                Console.WriteLine($"效果 {_currentEffect} 已启动");
+                NotifyStatusChanged();
+            });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"启动效果失败: {ex.Message}");
+        }
     }
 
     private void CycleBrightness()
@@ -352,14 +429,28 @@ public class RgbLedService : IDisposable
         var currentIndex = Array.IndexOf(levels, _currentBrightness);
         var nextIndex = (currentIndex + 1) % levels.Length;
         
+        var oldBrightness = _currentBrightness;
         _currentBrightness = levels[nextIndex];
         
-        // 立即应用新的亮度设置
+        Console.WriteLine($"亮度调节: {oldBrightness}% -> {_currentBrightness}%");
+        
+        // 立即应用新的亮度设置到当前效果
         if (_currentEffect == LedEffect.Static)
         {
             SetColor(_currentColor);
+            Console.WriteLine("静态模式 - 立即更新亮度");
         }
-        // 对于动态效果，亮度会在下次更新时生效
+        else if (_currentEffect == LedEffect.Off)
+        {
+            // 关闭状态下也要确保LED是关闭的
+            SetColor(LedColor.Black);
+            Console.WriteLine("关闭模式 - 确保LED关闭");
+        }
+        // 对于动态效果(闪烁、呼吸、彩虹)，亮度会在下次更新时生效
+        else
+        {
+            Console.WriteLine("动态模式 - 亮度将在下次更新生效");
+        }
         
         NotifyStatusChanged();
     }

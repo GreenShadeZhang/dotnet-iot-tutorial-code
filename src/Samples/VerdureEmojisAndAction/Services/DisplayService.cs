@@ -197,16 +197,20 @@ public class DisplayService : IDisposable
                     // 渲染当前帧
                     byte[] frameData = renderer.RenderFrame(frame, Display24Width, Display24Height);
 
-                    // 发送到2.4寸屏幕
-                    await Task.Run(() => _display24Inch.SendData(frameData), cancellationToken);
+                    // 发送到2.4寸屏幕 - 使用ConfigureAwait(false)避免死锁
+                    await Task.Run(() => _display24Inch.SendData(frameData), cancellationToken).ConfigureAwait(false);
 
-                    // 帧率控制
+                    // 帧率控制 - 更精确的时间控制
                     var elapsed = (DateTime.Now - startTime).TotalMilliseconds;
                     var delay = frameDurationMs - elapsed;
 
                     if (delay > 0)
                     {
-                        await Task.Delay((int)delay, cancellationToken);
+                        await Task.Delay((int)delay, cancellationToken).ConfigureAwait(false);
+                    }
+                    else if (delay < -frameDurationMs) // 如果延迟太久，记录警告
+                    {
+                        _logger.LogDebug($"帧渲染耗时过长: {elapsed}ms (目标: {frameDurationMs}ms)");
                     }
                 }
 
@@ -216,7 +220,8 @@ public class DisplayService : IDisposable
         }
         catch (OperationCanceledException)
         {
-            _logger.LogInformation($"表情播放 {emotionType} 已取消");
+            _logger.LogDebug($"表情播放 {emotionType} 已取消");
+            // 不清屏，保持最后一帧显示
         }
         catch (Exception ex)
         {
@@ -337,22 +342,58 @@ public class DisplayService : IDisposable
     /// <summary>
     /// 清除指定屏幕
     /// </summary>
-    public void ClearScreen(bool is24Inch = true)
+    /// <param name="is24Inch">是否为2.4寸屏幕</param>
+    /// <param name="color">清除的颜色 (RGB565格式，默认黑色)</param>
+    public void ClearScreen(bool is24Inch = true, ushort color = 0x0000)
     {
         try
         {
             if (is24Inch && _display24Inch != null)
             {
-                _display24Inch.FillScreen(0x0000);
+                _display24Inch.FillScreen(color);
+                _logger.LogDebug($"已清除2.4寸屏幕 (颜色: 0x{color:X4})");
             }
             else if (!is24Inch && _display147Inch != null)
             {
-                _display147Inch.FillScreen(0x0000);
+                _display147Inch.FillScreen(color);
+                _logger.LogDebug($"已清除1.47寸屏幕 (颜色: 0x{color:X4})");
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"清屏失败 (2.4寸: {is24Inch})");
+        }
+    }
+
+    /// <summary>
+    /// 渐变清屏 (可选的视觉效果)
+    /// </summary>
+    /// <param name="is24Inch">是否为2.4寸屏幕</param>
+    /// <param name="durationMs">渐变持续时间</param>
+    public async Task FadeToBlackAsync(bool is24Inch = true, int durationMs = 500)
+    {
+        try
+        {
+            const int steps = 10;
+            int delayPerStep = durationMs / steps;
+            
+            // 从当前显示内容逐渐变暗到黑色
+            for (int i = steps; i >= 0; i--)
+            {
+                // 这里可以实现更复杂的渐变效果
+                // 目前简化为直接清屏
+                if (i == 0)
+                {
+                    ClearScreen(is24Inch);
+                }
+                await Task.Delay(delayPerStep);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "渐变清屏失败");
+            // 回退到普通清屏
+            ClearScreen(is24Inch);
         }
     }
 

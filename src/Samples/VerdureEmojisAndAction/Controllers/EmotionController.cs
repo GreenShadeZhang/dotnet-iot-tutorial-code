@@ -198,21 +198,44 @@ public class EmotionController : ControllerBase
     /// <summary>
     /// 停止当前播放
     /// </summary>
+    /// <param name="clearScreen">是否清除屏幕</param>
     /// <returns>停止结果</returns>
     [HttpPost("stop")]
-    public async Task<IActionResult> Stop()
+    public async Task<IActionResult> Stop([FromQuery] bool clearScreen = false)
     {
         try
         {
-            _logger.LogInformation("收到停止播放请求");
+            _logger.LogInformation($"收到停止播放请求 (清屏: {clearScreen})");
             
-            await _emotionActionService.StopCurrentPlaybackAsync();
+            await _emotionActionService.StopCurrentPlaybackAsync(clearScreen);
             
             return Ok(new { success = true, message = "播放已停止" });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "停止播放请求处理失败");
+            return StatusCode(500, new { success = false, message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// 清除表情屏幕
+    /// </summary>
+    /// <returns>清屏结果</returns>
+    [HttpPost("clear-screen")]
+    public async Task<IActionResult> ClearScreen()
+    {
+        try
+        {
+            _logger.LogInformation("收到清屏请求");
+            
+            await _emotionActionService.ClearEmotionScreenAsync();
+            
+            return Ok(new { success = true, message = "屏幕已清除" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "清屏请求处理失败");
             return StatusCode(500, new { success = false, message = ex.Message });
         }
     }

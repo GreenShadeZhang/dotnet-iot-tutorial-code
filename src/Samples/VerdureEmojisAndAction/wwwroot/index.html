@@ -138,7 +138,8 @@
 
         <div class="button-group">
             <h3>控制命令</h3>
-            <button class="danger" onclick="stopPlayback()">⏹️ 停止播放</button>
+            <button class="danger" onclick="stopPlayback()">⏸️ 停止播放</button>
+            <button class="danger" onclick="clearScreen()">⏹️ 停止并清屏</button>
             <button class="success" onclick="initialize()">🔄 初始化机器人</button>
             <button onclick="runDemo()">🎪 运行演示程序</button>
         </div>
@@ -299,6 +300,11 @@
 
         async function stopPlayback() {
             await apiCall('/stop', 'POST');
+            setTimeout(updateStatus, 500);
+        }
+
+        async function clearScreen() {
+            await apiCall('/clear-screen', 'POST');
             setTimeout(updateStatus, 500);
         }
 

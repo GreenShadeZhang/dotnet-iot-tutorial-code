@@ -135,8 +135,8 @@ public class EmotionActionService : IDisposable
     /// </summary>
     public async Task<bool> PlayEmotionWithActionAsync(PlayRequest request)
     {
-        // 停止当前播放
-        await StopCurrentPlaybackAsync();
+        // 停止当前播放，但不清屏（避免黑屏闪烁）
+        await StopCurrentPlaybackAsync(clearScreen: false);
 
         var emotionType = !string.IsNullOrWhiteSpace(request.EmotionType) ? request.EmotionType : GetRandomEmotion();
         
@@ -292,7 +292,8 @@ public class EmotionActionService : IDisposable
     /// <summary>
     /// 停止当前播放
     /// </summary>
-    public async Task StopCurrentPlaybackAsync()
+    /// <param name="clearScreen">是否清除屏幕</param>
+    public async Task StopCurrentPlaybackAsync(bool clearScreen = false)
     {
         CancellationTokenSource? ctsToCancel = null;
         
@@ -307,15 +308,27 @@ public class EmotionActionService : IDisposable
         
         if (ctsToCancel != null)
         {
-            _logger.LogInformation("停止当前播放");
+            _logger.LogInformation($"停止当前播放 (清屏: {clearScreen})");
             ctsToCancel.Cancel();
             
             // 等待一小段时间让任务响应取消
             await Task.Delay(100);
             
-            // 清屏
-            _displayService.ClearScreen(true);
+            // 仅在明确要求时才清屏
+            if (clearScreen)
+            {
+                _displayService.ClearScreen(true);
+            }
         }
+    }
+
+    /// <summary>
+    /// 清除表情屏幕
+    /// </summary>
+    public async Task ClearEmotionScreenAsync()
+    {
+        _logger.LogInformation("清除表情屏幕");
+        await StopCurrentPlaybackAsync(clearScreen: true);
     }
 
     /// <summary>

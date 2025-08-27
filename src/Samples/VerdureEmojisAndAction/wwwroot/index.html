@@ -105,22 +105,34 @@
         
         <div class="button-group">
             <h3>组合播放</h3>
+            <button onclick="playEmotion('Neutral', true, true)">😐 平静 (表情+动作)</button>
             <button onclick="playEmotion('Happy', true, true)">😊 快乐 (表情+动作)</button>
-            <button onclick="playEmotion('Anger', true, true)">😠 愤怒 (表情+动作)</button>
+            <button onclick="playEmotion('Sad', true, true)">😢 悲伤 (表情+动作)</button>
+            <button onclick="playEmotion('Angry', true, true)">😠 愤怒 (表情+动作)</button>
+            <button onclick="playEmotion('Surprised', true, true)">😲 惊讶 (表情+动作)</button>
+            <button onclick="playEmotion('Confused', true, true)">😕 困惑 (表情+动作)</button>
             <button onclick="playRandom(true, true)">🎲 随机播放 (表情+动作)</button>
         </div>
 
         <div class="button-group">
             <h3>仅表情播放</h3>
+            <button onclick="playEmotion('Neutral', false, true)">😐 平静表情</button>
             <button onclick="playEmotion('Happy', false, true)">😊 快乐表情</button>
-            <button onclick="playEmotion('Anger', false, true)">😠 愤怒表情</button>
+            <button onclick="playEmotion('Sad', false, true)">😢 悲伤表情</button>
+            <button onclick="playEmotion('Angry', false, true)">😠 愤怒表情</button>
+            <button onclick="playEmotion('Surprised', false, true)">😲 惊讶表情</button>
+            <button onclick="playEmotion('Confused', false, true)">😕 困惑表情</button>
             <button onclick="playRandom(false, true)">🎲 随机表情</button>
         </div>
 
         <div class="button-group">
             <h3>仅动作播放</h3>
+            <button onclick="playEmotion('Neutral', true, false)">🤖 平静动作</button>
             <button onclick="playEmotion('Happy', true, false)">🤖 快乐动作</button>
-            <button onclick="playEmotion('Anger', true, false)">🤖 愤怒动作</button>
+            <button onclick="playEmotion('Sad', true, false)">🤖 悲伤动作</button>
+            <button onclick="playEmotion('Angry', true, false)">🤖 愤怒动作</button>
+            <button onclick="playEmotion('Surprised', true, false)">🤖 惊讶动作</button>
+            <button onclick="playEmotion('Confused', true, false)">🤖 困惑动作</button>
             <button onclick="playRandom(true, false)">🎲 随机动作</button>
         </div>
 
@@ -239,7 +251,7 @@
             
             // 确保枚举值正确匹配C#枚举
             const emotionTypeValue = emotionType === 'Happy' ? 'Happy' : 
-                                   emotionType === 'Anger' ? 'Anger' : emotionType;
+                                   emotionType === 'Angry' ? 'Angry' : emotionType;
             
             const request = {
                 emotionType: emotionTypeValue,

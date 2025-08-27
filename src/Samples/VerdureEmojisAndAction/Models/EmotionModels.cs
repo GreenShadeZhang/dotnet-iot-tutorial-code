@@ -5,11 +5,15 @@ namespace VerdureEmojisAndAction.Models;
 /// </summary>
 public static class EmotionTypes
 {
-    public const string Anger = "Anger";
+    public const string Neutral = "Neutral";
     public const string Happy = "Happy";
+    public const string Sad = "Sad";
+    public const string Angry = "Angry";
+    public const string Surprised = "Surprised";
+    public const string Confused = "Confused";
     public const string Random = "Random";
     
-    public static readonly string[] All = { Anger, Happy, Random };
+    public static readonly string[] All = { Neutral, Happy, Sad, Angry, Surprised, Confused, Random };
     
     public static bool IsValid(string? emotionType)
     {
@@ -19,7 +23,7 @@ public static class EmotionTypes
     
     public static string GetRandomEmotion()
     {
-        var availableEmotions = new[] { Anger, Happy };
+        var availableEmotions = new[] { Neutral, Happy, Sad, Angry, Surprised, Confused };
         var random = new Random();
         return availableEmotions[random.Next(availableEmotions.Length)];
     }

@@ -35,8 +35,12 @@ VerdureEmojisAndAction 是一个集成的机器人情感表达和动作控制系
 
 ### 支持的表情类型
 
-- **Anger (愤怒)**: 手臂张开，头部晃动
-- **Happy (快乐)**: 挥手，点头
+- **Neutral (平静)**: 轻柔自然的动作，耳朵和脖子的温和摆动  
+- **Happy (快乐)**: 活跃的耳朵活动，欢快的手臂摆动
+- **Sad (悲伤)**: 耳朵下垂，手臂下垂，缓慢的沮丧动作
+- **Angry (愤怒)**: 耳朵竖起，手臂张开威胁，激烈的头部晃动
+- **Surprised (惊讶)**: 突然的震惊姿态，快速的左右张望
+- **Confused (困惑)**: 不对称的耳朵动作，思考性的头部摆动
 
 ## 🚀 快速开始
 
@@ -89,7 +93,7 @@ POST /api/emotion/play-emotion/Happy?loops=1&fps=30
 
 #### 仅播放动作
 ```http
-POST /api/emotion/play-action/Anger
+POST /api/emotion/play-action/Angry
 ```
 
 #### 随机播放

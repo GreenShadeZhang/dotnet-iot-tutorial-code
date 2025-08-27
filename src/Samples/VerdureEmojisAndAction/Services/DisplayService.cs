@@ -88,20 +88,32 @@ public class DisplayService : IDisposable
     {
         try
         {
-            // 查找lottie文件
-            var angerFile = FindLottieFile("anger.mp4.lottie.json");
-            var happyFile = FindLottieFile("happy.mp4.lottie.json");
-
-            if (!string.IsNullOrEmpty(angerFile))
+            // 查找所有lottie文件
+            var emotionFiles = new Dictionary<string, string>
             {
-                _lottieRenderers[EmotionTypes.Anger] = new LottieRenderer(angerFile);
-                _logger.LogInformation($"加载愤怒表情文件: {angerFile}");
-            }
+                [EmotionTypes.Neutral] = "neutral.mp4.lottie.json",
+                [EmotionTypes.Happy] = "happy.mp4.lottie.json",
+                [EmotionTypes.Sad] = "sad.mp4.lottie.json",
+                [EmotionTypes.Angry] = "angry.mp4.lottie.json",
+                [EmotionTypes.Surprised] = "surprised.mp4.lottie.json",
+                [EmotionTypes.Confused] = "confused.mp4.lottie.json"
+            };
 
-            if (!string.IsNullOrEmpty(happyFile))
+            foreach (var kvp in emotionFiles)
             {
-                _lottieRenderers[EmotionTypes.Happy] = new LottieRenderer(happyFile);
-                _logger.LogInformation($"加载快乐表情文件: {happyFile}");
+                var emotionType = kvp.Key;
+                var fileName = kvp.Value;
+                var filePath = FindLottieFile(fileName);
+
+                if (!string.IsNullOrEmpty(filePath))
+                {
+                    _lottieRenderers[emotionType] = new LottieRenderer(filePath);
+                    _logger.LogInformation($"加载{emotionType}表情文件: {filePath}");
+                }
+                else
+                {
+                    _logger.LogWarning($"未找到{emotionType}表情文件: {fileName}");
+                }
             }
 
             _logger.LogInformation($"成功加载 {_lottieRenderers.Count} 个表情渲染器");
@@ -121,9 +133,11 @@ public class DisplayService : IDisposable
         var searchPaths = new[]
         {
             Path.Combine(Directory.GetCurrentDirectory(), fileName),
+            Path.Combine(Directory.GetCurrentDirectory(), "EmojisFile", fileName),
             Path.Combine(Directory.GetCurrentDirectory(), "Assets", fileName),
             Path.Combine(Directory.GetCurrentDirectory(), "Lottie", fileName),
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, fileName),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "EmojisFile", fileName),
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", fileName),
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Lottie", fileName),
         };

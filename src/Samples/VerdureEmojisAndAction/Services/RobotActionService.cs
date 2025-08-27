@@ -230,12 +230,28 @@ public class RobotActionService : IDisposable
 
         switch (emotionType)
         {
-            case EmotionTypes.Anger:
-                await PerformAngerActionAsync(cancellationToken);
+            case EmotionTypes.Neutral:
+                await PerformNeutralActionAsync(cancellationToken);
                 break;
-
+                
             case EmotionTypes.Happy:
                 await PerformHappyActionAsync(cancellationToken);
+                break;
+                
+            case EmotionTypes.Sad:
+                await PerformSadActionAsync(cancellationToken);
+                break;
+
+            case EmotionTypes.Angry:
+                await PerformAngryActionAsync(cancellationToken);
+                break;
+                
+            case EmotionTypes.Surprised:
+                await PerformSurprisedActionAsync(cancellationToken);
+                break;
+                
+            case EmotionTypes.Confused:
+                await PerformConfusedActionAsync(cancellationToken);
                 break;
 
             default:
@@ -298,7 +314,7 @@ public class RobotActionService : IDisposable
     /// <summary>
     /// 执行愤怒动作
     /// </summary>
-    private async Task PerformAngerActionAsync(CancellationToken cancellationToken)
+    private async Task PerformAngryActionAsync(CancellationToken cancellationToken)
     {
         _logger.LogDebug("开始执行愤怒动作序列");
         
@@ -524,6 +540,186 @@ public class RobotActionService : IDisposable
     public Dictionary<int, JointStatus> GetAllJoints()
     {
         return new Dictionary<int, JointStatus>(_joints);
+    }
+
+    /// <summary>
+    /// 执行中性/平静动作 - 轻柔的自然动作
+    /// </summary>
+    private async Task PerformNeutralActionAsync(CancellationToken cancellationToken)
+    {
+        _logger.LogDebug("开始执行平静动作序列");
+        
+        // 轻柔的耳朵活动
+        for (int i = 0; i < 2; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            
+            await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+            {
+                { 4, 5 },     // 左耳轻微活动
+                { 8, 5 },     // 右耳轻微活动
+                { 12, -10 }   // 脖子轻柔向左
+            }, cancellationToken);
+            await Task.Delay(1000, cancellationToken);
+
+            await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+            {
+                { 4, 0 },     // 左耳放松
+                { 8, 0 },     // 右耳放松
+                { 12, 10 }    // 脖子轻柔向右
+            }, cancellationToken);
+            await Task.Delay(1000, cancellationToken);
+        }
+
+        // 缓慢回到中性位置
+        await InitializePositionAsync(cancellationToken);
+        await Task.Delay(500, cancellationToken);
+    }
+
+    /// <summary>
+    /// 执行悲伤动作 - 低沉、缓慢的动作，模拟沮丧状态
+    /// </summary>
+    private async Task PerformSadActionAsync(CancellationToken cancellationToken)
+    {
+        _logger.LogDebug("开始执行悲伤动作序列");
+        
+        // 第一阶段：耳朵下垂，脖子低垂
+        await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+        {
+            { 4, -10 },   // 左耳下垂
+            { 8, -10 },   // 右耳下垂
+            { 12, -20 },  // 脖子低垂
+            { 6, 120 },   // 左臂下垂
+            { 10, 60 }    // 右臂下垂
+        }, cancellationToken);
+        await Task.Delay(2000, cancellationToken);
+
+        // 第二阶段：缓慢的摇摆，表现沮丧
+        for (int i = 0; i < 3; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            
+            await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+            {
+                { 12, -30 },  // 脖子左倾
+                { 6, 135 },   // 左臂更加下垂
+            }, cancellationToken);
+            await Task.Delay(1500, cancellationToken);
+
+            await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+            {
+                { 12, -10 },  // 脖子回到中心
+                { 6, 120 },   // 左臂回到下垂位置
+            }, cancellationToken);
+            await Task.Delay(1500, cancellationToken);
+        }
+
+        // 缓慢回到中性位置
+        await InitializePositionAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// 执行惊讶动作 - 突然的、快速的动作，表现震惊
+    /// </summary>
+    private async Task PerformSurprisedActionAsync(CancellationToken cancellationToken)
+    {
+        _logger.LogDebug("开始执行惊讶动作序列");
+        
+        // 第一阶段：突然的震惊姿态
+        await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+        {
+            { 4, 30 },    // 左耳惊讶竖起
+            { 8, 30 },    // 右耳惊讶竖起
+            { 6, 60 },    // 左臂张开
+            { 10, 120 },  // 右臂张开
+            { 12, 25 }    // 脖子惊讶转动
+        }, cancellationToken);
+        await Task.Delay(800, cancellationToken);
+
+        // 第二阶段：快速的左右张望
+        for (int i = 0; i < 4; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            
+            await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+            {
+                { 12, -35 },  // 脖子快速左转
+                { 4, 35 },    // 左耳更加竖起
+                { 8, 35 }     // 右耳更加竖起
+            }, cancellationToken);
+            await Task.Delay(300, cancellationToken);
+
+            await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+            {
+                { 12, 35 },   // 脖子快速右转
+            }, cancellationToken);
+            await Task.Delay(300, cancellationToken);
+        }
+
+        // 回到惊讶的中心姿态
+        await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+        {
+            { 12, 0 },    // 脖子回中心
+            { 4, 25 },    // 左耳保持竖起
+            { 8, 25 }     // 右耳保持竖起
+        }, cancellationToken);
+        await Task.Delay(1000, cancellationToken);
+
+        // 缓慢回到中性位置
+        await InitializePositionAsync(cancellationToken);
+    }
+
+    /// <summary>
+    /// 执行困惑动作 - 迟疑、思考性的动作
+    /// </summary>
+    private async Task PerformConfusedActionAsync(CancellationToken cancellationToken)
+    {
+        _logger.LogDebug("开始执行困惑动作序列");
+        
+        // 第一阶段：困惑的头部倾斜
+        await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+        {
+            { 4, 10 },    // 左耳轻微竖起
+            { 8, -10 },   // 右耳轻微下垂（不对称表现困惑）
+            { 12, 30 },   // 脖子困惑地向右倾斜
+            { 6, 80 },    // 左臂困惑姿态
+            { 10, 100 }   // 右臂困惑姿态
+        }, cancellationToken);
+        await Task.Delay(1500, cancellationToken);
+
+        // 第二阶段：思考性的左右摇摆
+        for (int i = 0; i < 3; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            
+            await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+            {
+                { 12, -25 },  // 脖子向左思考
+                { 4, 15 },    // 左耳活动
+                { 8, -5 }     // 右耳轻微活动
+            }, cancellationToken);
+            await Task.Delay(1200, cancellationToken);
+
+            await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+            {
+                { 12, 25 },   // 脖子向右思考
+                { 4, 5 },     // 左耳轻微活动
+                { 8, -15 }    // 右耳更加下垂
+            }, cancellationToken);
+            await Task.Delay(1200, cancellationToken);
+        }
+
+        // 第三阶段：最终的困惑摇头
+        await SetMultipleJointAnglesAsync(new Dictionary<int, float>
+        {
+            { 12, 0 },    // 脖子回中心
+            { 4, 8 },     // 左耳轻微困惑
+            { 8, -8 }     // 右耳轻微困惑
+        }, cancellationToken);
+        await Task.Delay(1000, cancellationToken);
+
+        // 缓慢回到中性位置
+        await InitializePositionAsync(cancellationToken);
     }
 
     public void Dispose()

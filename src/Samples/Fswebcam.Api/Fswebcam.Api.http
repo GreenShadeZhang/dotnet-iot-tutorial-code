@@ -1,0 +1,6 @@
+@Fswebcam.Api_HostAddress = http://localhost:5173
+
+GET {{Fswebcam.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

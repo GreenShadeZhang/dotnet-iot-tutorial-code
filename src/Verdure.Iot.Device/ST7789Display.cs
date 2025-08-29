@@ -732,16 +732,16 @@ public class ST7789Display : IDisposable
         _spiDevice?.Dispose();
 
         // 关闭GPIO引脚
-        if (_gpio != null)
-        {
-            _gpio?.ClosePin(_dcPin);
-            _gpio?.ClosePin(_resetPin);
-            if (_csPin >= 0)
-            {
-                _gpio?.ClosePin(_csPin);
-            }
-            _gpio?.Dispose();
-        }
+        //if (_gpio != null)
+        //{
+        //    _gpio?.ClosePin(_dcPin);
+        //    _gpio?.ClosePin(_resetPin);
+        //    if (_csPin >= 0)
+        //    {
+        //        _gpio?.ClosePin(_csPin);
+        //    }
+        //    _gpio?.Dispose();
+        //}
     }
 }
 

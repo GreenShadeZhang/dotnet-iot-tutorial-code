@@ -1,3 +1,4 @@
+
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
@@ -10,6 +11,16 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Verdure.Iot.Device\Verdure.Iot.Device.csproj" />
+    <PackageReference Include="SkiaSharp" Version="3.116.0" />
+    <PackageReference Include="SkiaSharp.Skottie" Version="3.116.0" />
+    <PackageReference Include="SkiaSharp.Resources" Version="3.116.0" />
+      <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="3.116.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="LottieLogo.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

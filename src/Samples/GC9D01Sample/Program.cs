@@ -20,22 +20,26 @@ using var display = new GC9D01Display(spiSettings, gpio, dcPin, resetPin, csPin)
 
 try
 {
-    while (true)
-    {
-        FillScreen(display, 0xF800); // 红色
-        Thread.Sleep(1000);
-        FillScreen(display, 0x07E0); // 绿色
-        Thread.Sleep(1000);
-        FillScreen(display, 0x001F); // 蓝色
-        Thread.Sleep(1000);
-        FillScreen(display, 0xFFFF); // 白色
-        Thread.Sleep(1000);
-    }
+    // 先切换三次颜色
+    FillScreen(display, 0xF800); // 红色
+    Thread.Sleep(1000);
+    FillScreen(display, 0x07E0); // 绿色
+    Thread.Sleep(1000);
+    FillScreen(display, 0x001F); // 蓝色
+    Thread.Sleep(1000);
+
+    // 播放Lottie动画（循环）
+    var lottiePath = "LottieLogo.json"; // 使用本地文件，便于直接运行
+    var player = new LottiePlayer(display, display.Width, display.Height, lottiePath);
+    Console.WriteLine("开始播放Lottie动画，按任意键停止...");
+    var playTask = player.PlayAnimationAsync(loops: -1, fps: 24);
+    Console.ReadKey();
+    player.StopAnimation();
+    await playTask;
 }
 catch (Exception ex)
 {
     Console.WriteLine($"错误: {ex.Message}");
 }
 
-// 业务代码无需关心窗口和缓冲区，直接调用驱动方法
 void FillScreen(GC9D01Display display, ushort color) => display.FillScreen(color);

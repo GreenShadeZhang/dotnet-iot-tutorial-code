@@ -35,7 +35,7 @@ public class LottiePlayer
                 {
                     var startTime = DateTime.Now;
                     byte[] frameData = _lottieRenderer.RenderFrame(frame, _width, _height);
-                    _display.FillScreen(0x0000); // 清屏
+                    // 移除清屏，直接显示动画帧
                     _display.SetAddressWindow(0, 0, _width - 1, _height - 1);
                     _display.SendData(frameData);
                     var elapsed = (DateTime.Now - startTime).TotalMilliseconds;

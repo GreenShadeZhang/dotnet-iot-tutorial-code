@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RGBLed.Api", "src\Samples\R
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fswebcam.Api", "src\Samples\Fswebcam.Api\Fswebcam.Api.csproj", "{B12C0C98-23AA-40F5-B9E7-9575D1623445}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GC9D01Sample", "src\Samples\GC9D01Sample\GC9D01Sample.csproj", "{9F786232-2966-4332-7D30-61A3DE591688}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +103,10 @@ Global
 		{B12C0C98-23AA-40F5-B9E7-9575D1623445}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B12C0C98-23AA-40F5-B9E7-9575D1623445}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B12C0C98-23AA-40F5-B9E7-9575D1623445}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F786232-2966-4332-7D30-61A3DE591688}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F786232-2966-4332-7D30-61A3DE591688}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F786232-2966-4332-7D30-61A3DE591688}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F786232-2966-4332-7D30-61A3DE591688}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -118,6 +124,7 @@ Global
 		{26A6CEA8-AF4C-43BE-9FDB-8AE5B2101788} = {A5139A99-41C9-4808-A175-7D83D860F646}
 		{EAC1CEE4-3211-4439-8B0E-E92AC8F34624} = {A5139A99-41C9-4808-A175-7D83D860F646}
 		{B12C0C98-23AA-40F5-B9E7-9575D1623445} = {A5139A99-41C9-4808-A175-7D83D860F646}
+		{9F786232-2966-4332-7D30-61A3DE591688} = {A5139A99-41C9-4808-A175-7D83D860F646}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5B15746B-2C90-40D5-A8AE-AE81B6B7766F}
